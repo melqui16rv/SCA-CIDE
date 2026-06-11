@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCA-CIDE - Registro de Aprendices</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Cropper.js for image cropping -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    
+    <!-- jsPDF for client-side PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <!-- Custom Styles -->
+    <link href="assets/css/styles.css" rel="stylesheet">
+</head>
+<body>
+    <div class="background-overlay"></div>
+
+    <div class="container" id="app-container">
+        <!-- View 1: Document Validation -->
+        <div id="view1" class="view active">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Bienvenido a SCA-CIDE</h2>
+                    <p>Complete su registro de aprendiz</p>
+                </div>
+                <div class="card-body">
+                    <form id="form-view1">
+                        <div class="form-group">
+                            <label for="numero_documento">Número de Documento</label>
+                            <input type="text" id="numero_documento" placeholder="Ingrese su documento de identidad" required autocomplete="off">
+                            <small class="error-msg" id="error-doc-msg"></small>
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="btn-validate">Siguiente</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- View 2: Registration Form -->
+        <div id="view2" class="view hidden">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Actualización de Datos</h2>
+                    <p>Por favor complete la información faltante</p>
+                </div>
+                <div class="card-body">
+                    <form id="form-view2">
+                        <!-- Auto-completed data (read-only) -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Nombre Completo</label>
+                                <input type="text" id="nombre_completo" readonly class="input-readonly">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Correo Electrónico</label>
+                                <input type="email" id="correo" readonly class="input-readonly">
+                            </div>
+                            <div class="form-group">
+                                <label>Teléfono</label>
+                                <input type="text" id="telefono" readonly class="input-readonly">
+                            </div>
+                        </div>
+
+                        <!-- User inputs -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="fecha_expedicion">Fecha de Expedición del Documento</label>
+                                <input type="date" id="fecha_expedicion" required>
+                            </div>
+                            <div class="form-group" id="lugar_expedicion_container">
+                                <label>Lugar de Expedición</label>
+                                <div class="lugar-controls" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px;">
+                                    <select id="lugar_depto" style="flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; outline: none; font-family: var(--font-family); background: #fff;">
+                                        <option value="">Departamento</option>
+                                    </select>
+                                    <select id="lugar_ciudad" style="flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; outline: none; font-family: var(--font-family); background: #fff;" disabled>
+                                        <option value="">Ciudad</option>
+                                    </select>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                                    <input type="checkbox" id="lugar_otro_check">
+                                    <label for="lugar_otro_check" style="margin: 0; font-weight: normal; font-size: 0.85rem; cursor: pointer;">Otro (ej. Extranjería)</label>
+                                </div>
+                                <input type="text" id="lugar_expedicion" placeholder="Escriba el lugar de expedición" style="display: none;">
+                            </div>
+                        </div>
+
+                        <div class="form-section" id="camera-section">
+                            <h3>Archivos Requeridos</h3>
+                            <p class="help-text">Tomaremos las fotos necesarias directamente desde tu cámara para asegurar el formato correcto.</p>
+                            
+                            <div class="media-status-container" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; font-size: 0.95rem;">
+                                <div id="status-foto" style="padding: 12px; background: var(--secondary-color); border-radius: 8px; display: flex; justify-content: space-between;">
+                                    <span>📸 Foto Carnet</span> <span class="badge pending" style="color: var(--error-color);">Pendiente</span>
+                                </div>
+                                <div id="status-doc-front" style="padding: 12px; background: var(--secondary-color); border-radius: 8px; display: flex; justify-content: space-between;">
+                                    <span>🪪 Doc. Frontal</span> <span class="badge pending" style="color: var(--error-color);">Pendiente</span>
+                                </div>
+                                <div id="status-doc-back" style="padding: 12px; background: var(--secondary-color); border-radius: 8px; display: flex; justify-content: space-between;">
+                                    <span>🪪 Doc. Reverso</span> <span class="badge pending" style="color: var(--error-color);">Pendiente</span>
+                                </div>
+                            </div>
+                            
+                            <button type="button" class="btn btn-primary" id="btn-open-camera" style="margin-bottom: 12px;">
+                                📷 Iniciar Captura de Cámara
+                            </button>
+                            
+                            <div style="text-align: center; font-size: 0.85rem;">
+                                ¿Problemas con la cámara? <a href="#" id="btn-fallback-upload" style="color: var(--primary-color);">Subir manualmente</a>
+                            </div>
+                        </div>
+
+                        <!-- Fallback upload (hidden by default) -->
+                        <div id="fallback-section" class="hidden">
+                            <div class="form-section">
+                                <h3>Subida Manual</h3>
+                                <div class="form-group file-group">
+                                    <label for="foto_input" class="file-label">Foto Carnet</label>
+                                    <input type="file" id="foto_input" accept="image/png, image/jpeg" style="display: none;">
+                                    <div id="foto_preview_container" style="display: none;"><img id="foto_image" src="" class="doc-preview"></div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group file-group">
+                                        <label for="doc_front_input" class="file-label">Doc. Lado Frontal</label>
+                                        <input type="file" id="doc_front_input" accept="image/png, image/jpeg" style="display: none;">
+                                        <img id="doc_front_preview" class="doc-preview hidden" src="">
+                                    </div>
+                                    <div class="form-group file-group">
+                                        <label for="doc_back_input" class="file-label">Doc. Lado Reverso</label>
+                                        <input type="file" id="doc_back_input" accept="image/png, image/jpeg" style="display: none;">
+                                        <img id="doc_back_preview" class="doc-preview hidden" src="">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" id="btn-back">Volver</button>
+                            <button type="submit" class="btn btn-primary" id="btn-submit">Guardar Datos</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- View 3: Admin Modal/Login -->
+        <div id="admin-login" class="view hidden">
+            <div class="card admin-card">
+                <div class="card-header">
+                    <h2>Acceso Administrativo</h2>
+                </div>
+                <div class="card-body">
+                    <form id="form-admin-login">
+                        <div class="form-group">
+                            <label for="admin_password">Contraseña</label>
+                            <input type="password" id="admin_password" required>
+                            <small class="error-msg" id="admin-error-msg"></small>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" id="btn-admin-cancel">Cancelar</button>
+                            <button type="submit" class="btn btn-primary">Ingresar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- View 4: Admin Dashboard -->
+        <div id="admin-dashboard" class="view hidden">
+            <div class="card dashboard-card">
+                <div class="card-header dashboard-header">
+                    <h2>Gestión de Aprendices</h2>
+                    <button type="button" class="btn btn-secondary" id="btn-logout">Cerrar Sesión</button>
+                </div>
+                <div class="card-body">
+                    <div class="dashboard-metrics" style="display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;">
+                        <div class="metric-card" style="flex: 1; padding: 16px; background: var(--secondary-color); border-radius: 8px; text-align: center;">
+                            <h4 style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">Total Registrados</h4>
+                            <p id="metric-total" style="font-size: 1.5rem; font-weight: 700; margin: 8px 0 0; color: var(--text-main);">0</p>
+                        </div>
+                        <div class="metric-card" style="flex: 1; padding: 16px; background: rgba(16, 185, 129, 0.1); border-radius: 8px; text-align: center;">
+                            <h4 style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">Validados</h4>
+                            <p id="metric-validado" style="font-size: 1.5rem; font-weight: 700; margin: 8px 0 0; color: var(--success-color);">0</p>
+                        </div>
+                        <div class="metric-card" style="flex: 1; padding: 16px; background: rgba(239, 68, 68, 0.1); border-radius: 8px; text-align: center;">
+                            <h4 style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">No Validados</h4>
+                            <p id="metric-no-validado" style="font-size: 1.5rem; font-weight: 700; margin: 8px 0 0; color: var(--error-color);">0</p>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-filters" style="display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;">
+                        <input type="text" id="admin-search" placeholder="Buscar por documento o nombre..." style="flex: 2;">
+                        <select id="admin-filter" style="flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; outline: none; background: #fff; font-family: var(--font-family);">
+                            <option value="todos">Todos</option>
+                            <option value="no_validado">Pendientes (No Validados)</option>
+                            <option value="validado">Validados</option>
+                        </select>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table id="users-table">
+                            <thead>
+                                <tr>
+                                    <th>Doc. / Nombre</th>
+                                    <th>Archivos</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-tbody">
+                                <!-- Data injected here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div id="loading-overlay" class="hidden">
+            <div class="spinner"></div>
+            <p id="loading-text">Procesando...</p>
+        </div>
+    </div>
+
+    <!-- Cropper Modal -->
+    <div id="cropper-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Ajustar Fotografía</h3>
+            <div class="cropper-container">
+                <img id="cropper-image" src="" alt="Cropper">
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" id="btn-crop-cancel">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btn-crop-confirm">Confirmar Recorte</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Camera Modal -->
+    <div id="camera-modal" class="modal hidden">
+        <div class="modal-content" style="max-width: 500px; padding: 16px; background: #111; color: #fff; border: 1px solid #333;">
+            <h3 id="camera-title" style="margin-top: 0; color: #fff; text-align: center; margin-bottom: 8px;">Capturar</h3>
+            <p id="camera-instructions" style="text-align: center; font-size: 0.9rem; color: #ccc; margin-bottom: 16px;">
+                Instrucciones
+            </p>
+            
+            <div class="camera-wrapper" style="position: relative; width: 100%; background: #000; border-radius: 12px; overflow: hidden; display: flex; justify-content: center; align-items: center;">
+                <!-- Fixed aspect ratio container -->
+                <div style="position: relative; width: 100%; padding-bottom: 133.33%;"> <!-- 3:4 ratio -->
+                    <video id="camera-video" autoplay playsinline style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;"></video>
+                    
+                    <!-- SVG Stencil Overlay -->
+                    <svg id="camera-stencil" viewBox="0 0 300 400" preserveAspectRatio="xMidYMid slice" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10;">
+                        <!-- Defs for mask -->
+                        <defs>
+                            <mask id="stencil-mask">
+                                <rect width="100%" height="100%" fill="white" />
+                                <path id="stencil-path" d="" fill="black" />
+                            </mask>
+                        </defs>
+                        <rect width="100%" height="100%" fill="rgba(0,0,0,0.6)" mask="url(#stencil-mask)" />
+                        <path id="stencil-border" d="" fill="none" stroke="#10b981" stroke-width="3" stroke-dasharray="10 5" />
+                    </svg>
+                </div>
+            </div>
+            
+            <div class="modal-actions" style="margin-top: 24px; justify-content: center; gap: 24px;">
+                <button type="button" class="btn btn-secondary" id="btn-camera-cancel" style="border-color: #555; color: #fff; padding: 12px 24px;">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btn-camera-capture" style="background: #fff; color: #000; display: flex; align-items: center; justify-content: center; border-radius: 50%; width: 60px; height: 60px; padding: 0;">
+                    <span style="display: block; width: 48px; height: 48px; border-radius: 50%; border: 2px solid #000; background: #fff;"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/js/app.js"></script>
+</body>
+</html>

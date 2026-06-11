@@ -40,7 +40,7 @@ direction BT
 
 ## vista 1(modulo 1):
 
-una vista la cual pregunte el numero de documento del aprendiz si el documento se encuentra en la tabla sca-cide_aprendices, el sistema debe dejar llenar el formulario y autocompletando los campos como nombre, correo, telefono, en caso de que no se encuentre en la tabla, el sistema debe mostrar un mensaje de error y no dejar llenar el formulario, el error no debe ser "el numero de documento ingresado no corresponde a un aprendiz registrado". y no lo dejara pasar hasta que el numero de documento si sea de un aprendiz registrado.
+una vista la cual pregunte el numero de documento del aprendiz si el documento se encuentra en la tabla sca-cide_aprendices, el sistema debe dejar llenar el formulario y autocompletando los campos c1omo nombre, correo, telefono, en caso de que no se encuentre en la tabla, el sistema debe mostrar un mensaje de error y no dejar llenar el formulario, el error no debe ser "el numero de documento ingresado no corresponde a un aprendiz registrado". y no lo dejara pasar hasta que el numero de documento si sea de un aprendiz registrado.
 
 ## vista 2(modulo 1):
 

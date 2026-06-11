@@ -136,6 +136,15 @@ document.addEventListener('DOMContentLoaded', () => {
             fotoImagePreview.src = url;
             fotoPreviewContainer.style.display = 'block';
             cropperModal.classList.add('hidden');
+
+            // Mark selfie as done
+            document.getElementById('status-foto').style.background = 'rgba(16,185,129,0.1)';
+            document.getElementById('status-foto').innerHTML = `<span>📸 Foto Carnet</span> <span class="badge success">✓ Capturado</span>`;
+
+            // Auto-advance to document front if not yet captured
+            if (!docFrontBase64) {
+                setTimeout(() => startCameraStep('doc-front'), 800);
+            }
         }, 'image/png', 0.8);
     });
 
@@ -150,11 +159,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function fetchUbicaciones() {
         try {
-            const res = await fetch('https://www.datos.gov.co/resource/xdk5-pm3f.json?$select=departamento,municipio&$limit=2000');
+            const res = await fetch('https://www.datos.gov.co/resource/gdxc-w37w.json?$select=dpto,nom_mpio&$limit=2000');
+            if (!res.ok) throw new Error('API no disponible');
             const data = await res.json();
-            divipolaData = data;
+            divipolaData = data.map(item => ({ departamento: item.dpto, municipio: item.nom_mpio }));
             
-            const deptos = [...new Set(data.map(item => item.departamento))].sort();
+            const deptos = [...new Set(divipolaData.map(item => item.departamento))].sort();
             
             deptos.forEach(d => {
                 const opt = document.createElement('option');
@@ -164,6 +174,11 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         } catch (err) {
             console.error('Error fetching ubicaciones:', err);
+            // Fallback: show text input if API fails
+            document.querySelector('.lugar-controls').style.display = 'none';
+            lugarInput.style.display = 'block';
+            lugarInput.placeholder = 'Escriba el departamento y ciudad (ej: Cundinamarca, Bogotá)';
+            lugarInput.required = true;
         }
     }
     fetchUbicaciones();
@@ -263,11 +278,17 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentCameraStream = null;
     let currentCameraStep = 'foto'; // 'foto', 'doc-front', 'doc-back'
 
-    // Define Stencils
-    // Oval for face
-    const STENCIL_OVAL = "M150,50 C210,50 250,120 250,200 C250,300 200,350 150,350 C100,350 50,300 50,200 C50,120 90,50 150,50 Z";
-    // Rectangle for Document (Horizontal)
-    const STENCIL_RECT = "M30,120 L270,120 L270,280 L30,280 Z";
+    // Define Stencils — SVG paths within a 300x400 viewBox
+    // Oval for face (portrait, centered)
+    const STENCIL_OVAL = "M150,55 C215,55 255,120 255,200 C255,305 205,355 150,355 C95,355 45,305 45,200 C45,120 85,55 150,55 Z";
+    // Rectangle for Document — landscape card centered in portrait viewBox
+    const STENCIL_RECT = "M20,130 L280,130 L280,270 L20,270 Z";
+    // Camera facing modes per step
+    const STEP_CONFIG = {
+        'foto':      { title: 'Foto Carnet',         hint: 'Centra tu rostro y hombros dentro del óvalo. Mantén el celular de frente a tu cara.',     stencil: STENCIL_OVAL, facing: 'user' },
+        'doc-front': { title: 'Doc. Frontal — Cédula', hint: 'Coloca la cédula con la FOTO visible dentro del recuadro verde. Fondo claro, sin reflejos.', stencil: STENCIL_RECT, facing: 'environment' },
+        'doc-back':  { title: 'Doc. Reverso — Cédula', hint: 'Voltea la cédula (lado con datos y código de barras) y ubícala dentro del recuadro verde.',  stencil: STENCIL_RECT, facing: 'environment' },
+    };
 
     document.getElementById('btn-fallback-upload').addEventListener('click', (e) => {
         e.preventDefault();
@@ -294,46 +315,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function startCameraStep(step) {
         currentCameraStep = step;
-        let facingMode = 'user'; // default front camera
+        const cfg = STEP_CONFIG[step];
 
-        if (step === 'foto') {
-            cameraTitle.textContent = "Foto Carnet";
-            cameraInstructions.textContent = "Ubica tu rostro dentro del óvalo asegurando buena iluminación.";
-            cameraStencilBorder.setAttribute('d', STENCIL_OVAL);
-            cameraStencilPath.setAttribute('d', STENCIL_OVAL);
-            facingMode = 'user';
-        } else if (step === 'doc-front') {
-            cameraTitle.textContent = "Documento Frontal";
-            cameraInstructions.textContent = "Ubica la parte frontal del documento dentro del recuadro.";
-            cameraStencilBorder.setAttribute('d', STENCIL_RECT);
-            cameraStencilPath.setAttribute('d', STENCIL_RECT);
-            facingMode = 'environment';
-        } else if (step === 'doc-back') {
-            cameraTitle.textContent = "Documento Reverso";
-            cameraInstructions.textContent = "Ubica la parte trasera del documento dentro del recuadro.";
-            cameraStencilBorder.setAttribute('d', STENCIL_RECT);
-            cameraStencilPath.setAttribute('d', STENCIL_RECT);
-            facingMode = 'environment';
-        }
+        cameraTitle.textContent = cfg.title;
+        cameraInstructions.textContent = cfg.hint;
+        cameraStencilBorder.setAttribute('d', cfg.stencil);
+        cameraStencilPath.setAttribute('d', cfg.stencil);
 
         cameraModal.classList.remove('hidden');
 
         try {
-            if (currentCameraStream) {
-                stopCamera();
-            }
-            const constraints = {
-                video: { facingMode: facingMode, width: { ideal: 1280 }, height: { ideal: 720 } },
+            if (currentCameraStream) stopCamera();
+
+            // Try ideal facingMode; fallback gracefully
+            let constraints = {
+                video: { facingMode: { ideal: cfg.facing }, width: { ideal: 1280 }, height: { ideal: 720 } },
                 audio: false
             };
             currentCameraStream = await navigator.mediaDevices.getUserMedia(constraints);
             cameraVideo.srcObject = currentCameraStream;
         } catch (err) {
             console.error('Camera access error:', err);
-            alert('No se pudo acceder a la cámara. Asegúrese de dar permisos o intente con el botón "Subir manualmente".');
             cameraModal.classList.add('hidden');
-            document.getElementById('camera-section').style.display = 'none';
-            document.getElementById('fallback-section').classList.remove('hidden');
+            stopCamera();
+            const goFallback = confirm('No se pudo acceder a la cámara.\n\n¿Desea subir las fotos manualmente desde su galería?');
+            if (goFallback) {
+                document.getElementById('camera-section').style.display = 'none';
+                document.getElementById('fallback-section').classList.remove('hidden');
+            }
         }
     }
 
@@ -347,45 +356,42 @@ document.addEventListener('DOMContentLoaded', () => {
     btnCameraCapture.addEventListener('click', () => {
         if (!currentCameraStream) return;
         
-        // Create a canvas to grab the frame
+        // Capture current video frame at full resolution
         const canvas = document.createElement('canvas');
         canvas.width = cameraVideo.videoWidth;
         canvas.height = cameraVideo.videoHeight;
         const ctx = canvas.getContext('2d');
         ctx.drawImage(cameraVideo, 0, 0, canvas.width, canvas.height);
         
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
         stopCamera();
         cameraModal.classList.add('hidden');
 
         if (currentCameraStep === 'foto') {
-            // For foto, pass to cropper
+            // For portrait photo — send through Cropper for adjustment
             cropperImage.src = dataUrl;
             cropperModal.classList.remove('hidden');
             if (cropper) cropper.destroy();
             cropper = new Cropper(cropperImage, {
                 aspectRatio: 3 / 4,
-                viewMode: 2,
+                viewMode: 1,
+                guides: true,
+                center: true,
+                highlight: true,
             });
-            document.getElementById('status-foto').className = 'media-status-item success';
-            document.getElementById('status-foto').innerHTML = `<span>📸 Foto Carnet</span> <span class="badge success">Completado</span>`;
-            
-            // Check if we should automatically start next
-            if (!docFrontBase64) {
-                setTimeout(() => startCameraStep('doc-front'), 1000);
-            }
+            // Status will be updated after crop confirm
         } else if (currentCameraStep === 'doc-front') {
             docFrontBase64 = dataUrl;
-            document.getElementById('status-doc-front').className = 'media-status-item success';
-            document.getElementById('status-doc-front').innerHTML = `<span>🪪 Doc. Frontal</span> <span class="badge success">Completado</span>`;
+            document.getElementById('status-doc-front').style.background = 'rgba(16,185,129,0.1)';
+            document.getElementById('status-doc-front').innerHTML = `<span>🪪 Doc. Frontal</span> <span class="badge success">✓ Capturado</span>`;
             
             if (!docBackBase64) {
-                setTimeout(() => startCameraStep('doc-back'), 500);
+                setTimeout(() => startCameraStep('doc-back'), 600);
             }
         } else if (currentCameraStep === 'doc-back') {
             docBackBase64 = dataUrl;
-            document.getElementById('status-doc-back').className = 'media-status-item success';
-            document.getElementById('status-doc-back').innerHTML = `<span>🪪 Doc. Reverso</span> <span class="badge success">Completado</span>`;
+            document.getElementById('status-doc-back').style.background = 'rgba(16,185,129,0.1)';
+            document.getElementById('status-doc-back').innerHTML = `<span>🪪 Doc. Reverso</span> <span class="badge success">✓ Capturado</span>`;
         }
     });
 
@@ -412,17 +418,52 @@ document.addEventListener('DOMContentLoaded', () => {
         showLoading('Generando documento y guardando...');
 
         try {
-            // Generate PDF using jsPDF
+            // Generate PDF using jsPDF — A4 portrait layout
             const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF('p', 'mm', 'letter');
             
-            // Front image
-            pdf.text('Documento de Identidad - Frontal', 10, 10);
-            pdf.addImage(docFrontBase64, 'JPEG', 10, 15, 190, 100);
-            
-            // Back image
-            pdf.text('Documento de Identidad - Reverso', 10, 125);
-            pdf.addImage(docBackBase64, 'JPEG', 10, 130, 190, 100);
+            // Load images to determine dimensions
+            const loadImage = (dataUrl) => new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => resolve(img);
+                img.src = dataUrl;
+            });
+
+            const imgFront = await loadImage(docFrontBase64);
+            const imgBack  = await loadImage(docBackBase64);
+
+            const pdf = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
+            const pageW = 210;  // A4 width mm
+            const pageH = 297;  // A4 height mm
+            const margin = 10;
+            const usableW = pageW - margin * 2;
+
+            // Helper: add image maintaining aspect ratio
+            const addDocImage = (img, yStart, maxH) => {
+                const aspect = img.naturalWidth / img.naturalHeight;
+                const imgW = usableW;
+                const imgH = Math.min(imgW / aspect, maxH);
+                // Detect format from data URL prefix
+                const fmt = img.src.startsWith('data:image/png') ? 'PNG' : 'JPEG';
+                pdf.addImage(img.src, fmt, margin, yStart, imgW, imgH);
+                return imgH;
+            };
+
+            // Page 1: Front of ID
+            pdf.setFontSize(13);
+            pdf.setFont('helvetica', 'bold');
+            pdf.text('Documento de Identidad — Cara Frontal', margin, 14);
+            pdf.setFont('helvetica', 'normal');
+            pdf.setFontSize(10);
+            pdf.setTextColor(120, 120, 120);
+            pdf.text('SCA-CIDE — Sistema de Registro de Aprendices', margin, 20);
+            pdf.setTextColor(0, 0, 0);
+            const hFront = addDocImage(imgFront, 26, pageH / 2 - 30);
+
+            // Page 1: Back of ID (below)
+            pdf.setFontSize(13);
+            pdf.setFont('helvetica', 'bold');
+            pdf.text('Documento de Identidad — Reverso', margin, 26 + hFront + 10);
+            addDocImage(imgBack, 26 + hFront + 16, pageH / 2 - 30);
 
             const pdfBlob = pdf.output('blob');
 
@@ -557,15 +598,22 @@ document.addEventListener('DOMContentLoaded', () => {
             const tr = document.createElement('tr');
             const isChecked = user.estado_validacion === 'validado' ? 'checked' : '';
             
+            // The DB stores 'SCA-APP/fotografias/file.png'
+            // When served from the SCA-APP root, strip the 'SCA-APP/' prefix
+            const fotoUrl = (user.ruta_foto_aprendiz || '').replace(/^SCA-APP\//, '');
+            const pdfUrl  = (user.ruta_documento_identificacion_aprendiz || '').replace(/^SCA-APP\//, '');
+            
             tr.innerHTML = `
                 <td>
                     <strong>${user.numero_documento_aprendiz}</strong><br>
                     ${user.nombre_completo_aprendiz}<br>
+                    <small style="color:var(--text-muted);">${user.correo_electronico_aprendiz || ''}</small><br>
                     <small style="color:var(--text-muted);">${user.telefono_aprendiz || 'Sin teléfono'}</small>
                 </td>
                 <td>
-                    <a href="${user.ruta_foto_aprendiz}" target="_blank" download style="display:inline-block; margin-bottom:4px; font-weight:600; color:var(--primary-color);">📷 Foto Carnet</a> <br>
-                    <a href="${user.ruta_documento_identificacion_aprendiz}" target="_blank" download style="font-weight:600; color:var(--primary-color);">📄 Doc. PDF</a>
+                    ${fotoUrl ? `<a href="${fotoUrl}" target="_blank" download style="display:inline-block; margin-bottom:4px; font-weight:600; color:var(--primary-color);">📷 Foto Carnet</a>` : '<span style="color:var(--text-muted);">Sin foto</span>'}
+                    <br>
+                    ${pdfUrl ? `<a href="${pdfUrl}" target="_blank" download style="font-weight:600; color:var(--primary-color);">📄 Doc. PDF</a>` : '<span style="color:var(--text-muted);">Sin documento</span>'}
                 </td>
                 <td>
                     <div style="display:flex; align-items:center; gap:8px;">

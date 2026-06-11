@@ -30,8 +30,8 @@ try {
 
     if ($action === 'list') {
         $pdo = getPDOConnection();
-        // Fetch users who have submitted the second step (i.e. have a photo route)
-        $stmt = $pdo->query('SELECT * FROM sca_cide_aprendices WHERE ruta_foto_aprendiz IS NOT NULL AND ruta_foto_aprendiz != "" ORDER BY nombre_completo_aprendiz ASC');
+        // Fetch all aprendices registered in the system
+        $stmt = $pdo->query('SELECT * FROM sca_cide_aprendices ORDER BY nombre_completo_aprendiz ASC');
         $users = $stmt->fetchAll();
         echo json_encode(['success' => true, 'data' => $users]);
         exit;

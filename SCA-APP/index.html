@@ -45,13 +45,13 @@
         </div>
 
         <!-- View 2: Registration Form -->
-        <div id="view2" class="view hidden">
-            <div class="card">
+        <div id="view2" class="view hidden" style="max-width: 1200px; margin: 0 auto; padding: 0 16px">
+            <div class="card " style="max-width: 100%; width: 100%;">
                 <div class="card-header">
                     <h2>Actualización de Datos</h2>
                     <p>Por favor complete la información faltante</p>
                 </div>
-                <div class="card-body">
+                <div class="card-body" style="max-width: 100%; width: 100%;" >
                     <form id="form-view2">
                         <!-- Auto-completed data (read-only) -->
                         <div class="form-row">
@@ -72,11 +72,27 @@
                         </div>
 
                         <!-- User inputs -->
-                        <div class="form-row">
                             <div class="form-group">
-                                <label for="fecha_expedicion">Fecha de Expedición del Documento</label>
-                                <input type="date" id="fecha_expedicion" required>
+                            <label>Fecha de Expedición del Documento</label>
+                            <div class="dp-wrap" id="dpWrap">
+                                <div class="dp-input" id="dpInput" tabindex="0">
+                                    <span id="dpDisplay" style="color: var(--text-muted);">AAAA / MM / DD</span>
+                                    <span style="margin-left:auto;">📅</span>
+                                    </div>
+                                    <div class="dp-panel" id="dpPanel">
+                                    <div class="dp-header">
+                                        <div class="dp-nav">
+                                        <button type="button" id="dpPrev">&#8249;</button>
+                                        <button type="button" id="dpNext">&#8250;</button>
+                                        </div>
+                                        <span id="dpStepLabel">Selecciona el año</span>
+                                    </div>
+                                    <div class="dp-grid" id="dpGrid"></div>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="fecha_expedicion">
                             </div>
+  
                             <div class="form-group" id="lugar_expedicion_container">
                                 <label>Lugar de Expedición</label>
                                 <div class="lugar-controls" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px;">
@@ -99,15 +115,56 @@
                             <h3>Archivos Requeridos</h3>
                             <p class="help-text">Tomaremos las fotos necesarias directamente desde tu cámara para asegurar el formato correcto.</p>
                             
-                            <div class="media-status-container" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; font-size: 0.95rem;">
-                                <div id="status-foto" style="padding: 12px; background: var(--secondary-color); border-radius: 8px; display: flex; justify-content: space-between;">
-                                    <span>📸 Foto Carnet</span> <span class="badge pending" style="color: var(--error-color);">Pendiente</span>
+                            <div class="media-status-container" id="media-files-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px;">
+                                <!-- Foto Aprendiz -->
+                                <div class="media-item" data-type="foto" style="background: var(--secondary-color); padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                                    <div class="media-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                        <span class="media-label" style="font-weight: 600; font-size: 0.95rem;">Foto Aprendiz</span>
+                                        <span id="badge-foto" class="badge pending">Pendiente</span>
+                                    </div>
+                                    <div class="media-preview-wrap" style="position: relative; margin-bottom: 12px;">
+                                        <div id="foto-preview-box" class="media-placeholder" style="background: #fff; height: 180px; border: 2px dashed #cbd5e1; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                                            <span class="media-icon" style="font-size: 2.5rem;">📸</span>
+                                        </div>
+                                    </div>
+                                    <div class="media-actions" style="display: flex; gap: 6px;">
+                                        <button type="button" class="btn-sm btn-primary" id="btn-capture-foto" style="flex: 1; padding: 8px; font-size: 0.85rem;">Capturar</button>
+                                        <button type="button" class="btn-sm btn-secondary" id="btn-delete-foto" style="flex: 1; padding: 8px; font-size: 0.85rem; display: none;">Eliminar</button>
+                                    </div>
                                 </div>
-                                <div id="status-doc-front" style="padding: 12px; background: var(--secondary-color); border-radius: 8px; display: flex; justify-content: space-between;">
-                                    <span>🪪 Doc. Frontal</span> <span class="badge pending" style="color: var(--error-color);">Pendiente</span>
+                                
+                                <!-- Doc Frontal -->
+                                <div class="media-item" data-type="doc-front" style="background: var(--secondary-color); padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                                    <div class="media-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                        <span class="media-label" style="font-weight: 600; font-size: 0.95rem;">Doc. Frontal</span>
+                                        <span id="badge-doc-front" class="badge pending">Pendiente</span>
+                                    </div>
+                                    <div class="media-preview-wrap" style="position: relative; margin-bottom: 12px;">
+                                        <div id="doc-front-preview-box" class="media-placeholder" style="background: #fff; height: 180px; border: 2px dashed #cbd5e1; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                                            <span class="media-icon" style="font-size: 2.5rem;">🪪</span>
+                                        </div>
+                                    </div>
+                                    <div class="media-actions" style="display: flex; gap: 6px;">
+                                        <button type="button" class="btn-sm btn-primary" id="btn-capture-doc-front" style="flex: 1; padding: 8px; font-size: 0.85rem;">Capturar</button>
+                                        <button type="button" class="btn-sm btn-secondary" id="btn-delete-doc-front" style="flex: 1; padding: 8px; font-size: 0.85rem; display: none;">Eliminar</button>
+                                    </div>
                                 </div>
-                                <div id="status-doc-back" style="padding: 12px; background: var(--secondary-color); border-radius: 8px; display: flex; justify-content: space-between;">
-                                    <span>🪪 Doc. Reverso</span> <span class="badge pending" style="color: var(--error-color);">Pendiente</span>
+                                
+                                <!-- Doc Reverso -->
+                                <div class="media-item" data-type="doc-back" style="background: var(--secondary-color); padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                                    <div class="media-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                        <span class="media-label" style="font-weight: 600; font-size: 0.95rem;">Doc. Reverso</span>
+                                        <span id="badge-doc-back" class="badge pending">Pendiente</span>
+                                    </div>
+                                    <div class="media-preview-wrap" style="position: relative; margin-bottom: 12px;">
+                                        <div id="doc-back-preview-box" class="media-placeholder" style="background: #fff; height: 180px; border: 2px dashed #cbd5e1; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                                            <span class="media-icon" style="font-size: 2.5rem;">🪪</span>
+                                        </div>
+                                    </div>
+                                    <div class="media-actions" style="display: flex; gap: 6px;">
+                                        <button type="button" class="btn-sm btn-primary" id="btn-capture-doc-back" style="flex: 1; padding: 8px; font-size: 0.85rem;">Capturar</button>
+                                        <button type="button" class="btn-sm btn-secondary" id="btn-delete-doc-back" style="flex: 1; padding: 8px; font-size: 0.85rem; display: none;">Eliminar</button>
+                                    </div>
                                 </div>
                             </div>
                             
@@ -123,22 +180,37 @@
                         <!-- Fallback upload (hidden by default) -->
                         <div id="fallback-section" class="hidden">
                             <div class="form-section">
-                                <h3>Subida Manual</h3>
-                                <div class="form-group file-group">
-                                    <label for="foto_input" class="file-label">Foto Carnet</label>
-                                    <input type="file" id="foto_input" accept="image/png, image/jpeg" style="display: none;">
-                                    <div id="foto_preview_container" style="display: none;"><img id="foto_image" src="" class="doc-preview"></div>
-                                </div>
-                                <div class="form-row">
-                                    <div class="form-group file-group">
-                                        <label for="doc_front_input" class="file-label">Doc. Lado Frontal</label>
-                                        <input type="file" id="doc_front_input" accept="image/png, image/jpeg" style="display: none;">
-                                        <img id="doc_front_preview" class="doc-preview hidden" src="">
+                                <h3>Subida Manual de Documentos</h3>
+                                <p class="help-text">Sube los documentos requeridos en formato PNG o JPG.</p>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                                    <!-- Foto Aprendiz -->
+                                    <div style="background: var(--secondary-color); padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                                        <label for="foto_input" style="font-weight: 600; margin-bottom: 12px; display: block;">Foto Aprendiz</label>
+                                        <input type="file" id="foto_input" accept="image/png, image/jpeg" style="display: none;">
+                                        <div id="foto_preview_container" style="display: none; margin-bottom: 12px;">
+                                            <img id="foto_image" src="" class="doc-preview" style="width: 100%; border-radius: 6px;">
+                                        </div>
+                                        <button type="button" class="btn-sm btn-primary" onclick="document.getElementById('foto_input').click();" style="width: 100%;">📸 Seleccionar Foto</button>
                                     </div>
-                                    <div class="form-group file-group">
-                                        <label for="doc_back_input" class="file-label">Doc. Lado Reverso</label>
+                                    
+                                    <!-- Doc Frontal -->
+                                    <div style="background: var(--secondary-color); padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                                        <label for="doc_front_input" style="font-weight: 600; margin-bottom: 12px; display: block;">Doc. Lado Frontal</label>
+                                        <input type="file" id="doc_front_input" accept="image/png, image/jpeg" style="display: none;">
+                                        <div id="doc_front_preview_container" style="display: none; margin-bottom: 12px;">
+                                            <img id="doc_front_preview" src="" class="doc-preview" style="width: 100%; border-radius: 6px;">
+                                        </div>
+                                        <button type="button" class="btn-sm btn-primary" onclick="document.getElementById('doc_front_input').click();" style="width: 100%;">🪪 Seleccionar Doc</button>
+                                    </div>
+                                    
+                                    <!-- Doc Reverso -->
+                                    <div style="background: var(--secondary-color); padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                                        <label for="doc_back_input" style="font-weight: 600; margin-bottom: 12px; display: block;">Doc. Lado Reverso</label>
                                         <input type="file" id="doc_back_input" accept="image/png, image/jpeg" style="display: none;">
-                                        <img id="doc_back_preview" class="doc-preview hidden" src="">
+                                        <div id="doc_back_preview_container" style="display: none; margin-bottom: 12px;">
+                                            <img id="doc_back_preview" src="" class="doc-preview" style="width: 100%; border-radius: 6px;">
+                                        </div>
+                                        <button type="button" class="btn-sm btn-primary" onclick="document.getElementById('doc_back_input').click();" style="width: 100%;">🪪 Seleccionar Doc</button>
                                     </div>
                                 </div>
                             </div>
@@ -182,44 +254,75 @@
                     <h2>Gestión de Aprendices</h2>
                     <button type="button" class="btn btn-secondary" id="btn-logout">Cerrar Sesión</button>
                 </div>
-                <div class="card-body">
-                    <div class="dashboard-metrics" style="display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;">
-                        <div class="metric-card" style="flex: 1; padding: 16px; background: var(--secondary-color); border-radius: 8px; text-align: center;">
-                            <h4 style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">Total Registrados</h4>
+                <div class="card-body" style="width: 100%; overflow-x: auto;">
+                    <!-- Métricas Principales -->
+                    <div class="dashboard-metrics" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 24px;">
+                        <div class="metric-card" style="padding: 16px; background: var(--secondary-color); border-radius: 8px; text-align: center;">
+                            <h4 style="margin: 0; color: var(--text-muted); font-size: 0.85rem;">Total Registrados</h4>
                             <p id="metric-total" style="font-size: 1.5rem; font-weight: 700; margin: 8px 0 0; color: var(--text-main);">0</p>
                         </div>
-                        <div class="metric-card" style="flex: 1; padding: 16px; background: rgba(16, 185, 129, 0.1); border-radius: 8px; text-align: center;">
-                            <h4 style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">Validados</h4>
+                        <div class="metric-card" style="padding: 16px; background: rgba(16, 185, 129, 0.1); border-radius: 8px; text-align: center;">
+                            <h4 style="margin: 0; color: var(--text-muted); font-size: 0.85rem;">Validados</h4>
                             <p id="metric-validado" style="font-size: 1.5rem; font-weight: 700; margin: 8px 0 0; color: var(--success-color);">0</p>
                         </div>
-                        <div class="metric-card" style="flex: 1; padding: 16px; background: rgba(239, 68, 68, 0.1); border-radius: 8px; text-align: center;">
-                            <h4 style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">No Validados</h4>
+                        <div class="metric-card" style="padding: 16px; background: rgba(239, 68, 68, 0.1); border-radius: 8px; text-align: center;">
+                            <h4 style="margin: 0; color: var(--text-muted); font-size: 0.85rem;">No Validados</h4>
                             <p id="metric-no-validado" style="font-size: 1.5rem; font-weight: 700; margin: 8px 0 0; color: var(--error-color);">0</p>
+                        </div>
+                        <div class="metric-card" style="padding: 16px; background: rgba(59, 130, 246, 0.1); border-radius: 8px; text-align: center;">
+                            <h4 style="margin: 0; color: var(--text-muted); font-size: 0.85rem;">Falta Foto</h4>
+                            <p id="metric-falta-foto" style="font-size: 1.5rem; font-weight: 700; margin: 8px 0 0; color: #3b82f6;">0</p>
+                        </div>
+                        <div class="metric-card" style="padding: 16px; background: rgba(244, 63, 94, 0.1); border-radius: 8px; text-align: center;">
+                            <h4 style="margin: 0; color: var(--text-muted); font-size: 0.85rem;">Falta Documento</h4>
+                            <p id="metric-falta-doc" style="font-size: 1.5rem; font-weight: 700; margin: 8px 0 0; color: #f43f5e;">0</p>
+                        </div>
+                        <div class="metric-card" style="padding: 16px; background: rgba(34, 197, 94, 0.1); border-radius: 8px; text-align: center;">
+                            <h4 style="margin: 0; color: var(--text-muted); font-size: 0.85rem;">Completos</h4>
+                            <p id="metric-completos" style="font-size: 1.5rem; font-weight: 700; margin: 8px 0 0; color: #22c55e;">0</p>
                         </div>
                     </div>
 
-                    <div class="dashboard-filters" style="display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;">
-                        <input type="text" id="admin-search" placeholder="Buscar por documento o nombre..." style="flex: 2;">
-                        <select id="admin-filter" style="flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; outline: none; background: #fff; font-family: var(--font-family);">
+                    <!-- Filtros y Búsqueda -->
+                    <div class="dashboard-filters" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 24px;">
+                        <input type="text" id="admin-search" placeholder="Buscar documento o nombre..." style="grid-column: span 2; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-family: var(--font-family); font-size: 0.95rem;">
+                        <select id="admin-filter" style="padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; outline: none; background: #fff; font-family: var(--font-family); font-size: 0.95rem;">
                             <option value="todos">Todos</option>
-                            <option value="no_validado">Pendientes (No Validados)</option>
-                            <option value="validado">Validados</option>
+                            <option value="validado">✓ Validados</option>
+                            <option value="no_validado">⏳ Pendientes</option>
+                            <option value="completos">✓✓ Completos</option>
+                            <option value="falta_foto">Falta Foto</option>
+                            <option value="falta_doc">Falta Documento</option>
+                        </select>
+                        <select id="admin-page-size" style="padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; outline: none; background: #fff; font-family: var(--font-family); font-size: 0.95rem;">
+                            <option value="10">10 registros</option>
+                            <option value="50">50 registros</option>
+                            <option value="100">100 registros</option>
                         </select>
                     </div>
 
-                    <div class="table-responsive">
-                        <table id="users-table">
+                    <!-- Tabla -->
+                    <div class="table-responsive" style="border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">
+                        <table id="users-table" style="width: 100%;">
                             <thead>
                                 <tr>
-                                    <th>Doc. / Nombre</th>
-                                    <th>Archivos</th>
-                                    <th>Estado</th>
+                                    <th style="min-width: 250px;">Documento / Nombre</th>
+                                    <th style="min-width: 180px;">Correo</th>
+                                    <th style="min-width: 120px;">Fotos</th>
+                                    <th style="min-width: 140px;">Validación</th>
                                 </tr>
                             </thead>
                             <tbody id="users-tbody">
                                 <!-- Data injected here -->
                             </tbody>
                         </table>
+                    </div>
+
+                    <!-- Paginador -->
+                    <div id="pagination-container" class="pagination-container" style="display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: 24px; flex-wrap: wrap;">
+                        <button id="btn-prev-page" class="btn-sm btn-secondary" style="padding: 8px 12px; font-size: 0.9rem;">← Anterior</button>
+                        <div id="pagination-info" style="font-size: 0.9rem; color: var(--text-muted); min-width: 120px; text-align: center;">Página 1 de 1</div>
+                        <button id="btn-next-page" class="btn-sm btn-secondary" style="padding: 8px 12px; font-size: 0.9rem;">Siguiente →</button>
                     </div>
                 </div>
             </div>

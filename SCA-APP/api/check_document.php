@@ -1,5 +1,8 @@
 <?php
-// SCA-APP/api/check_document.php
+/**
+ * API - Check Document
+ * Verifies if a document exists in the system
+ */
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 
@@ -11,21 +14,37 @@ try {
     $documento = $_GET['documento'] ?? '';
     
     if (empty($documento)) {
-        echo json_encode(['success' => false, 'message' => 'Documento no proporcionado.']);
-        exit;
+        throw new Exception('Por favor, ingresa tu número de documento.');
     }
 
-    $stmt = $pdo->prepare('SELECT numero_documento_aprendiz, nombre_completo_aprendiz, correo_electronico_aprendiz, telefono_aprendiz, ruta_foto_aprendiz, fecha_expedicion_documento_identificacion_aprendiz, lugar_expedicion_documento_identificacion_aprendiz, ruta_documento_identificacion_aprendiz FROM sca_cide_aprendices WHERE numero_documento_aprendiz = ?');
+    // Sanitize document (only numbers)
+    $documento = preg_replace('/[^0-9]/', '', $documento);
+
+    $stmt = $pdo->prepare('
+        SELECT 
+            numero_documento_aprendiz, 
+            nombre_completo_aprendiz, 
+            correo_electronico_aprendiz, 
+            telefono_aprendiz 
+        FROM sca_cide_aprendices 
+        WHERE numero_documento_aprendiz = ?
+    ');
     $stmt->execute([$documento]);
     $aprendiz = $stmt->fetch();
 
     if ($aprendiz) {
         echo json_encode(['success' => true, 'data' => $aprendiz]);
     } else {
-        echo json_encode(['success' => false, 'message' => 'No se encontraron registros asociados al documento ingresado. Por favor, verifique e intente nuevamente.']);
+        echo json_encode([
+            'success' => false, 
+            'message' => 'No encontramos un aprendiz con ese número. Por favor, verifica los datos o solicita ayuda en tu centro.'
+        ]);
     }
 
 } catch (Exception $e) {
-    echo json_encode(['success' => false, 'message' => 'Error de servidor. No se pudo conectar a la base de datos o ejecutar la consulta.']);
-    // Log exception somewhere if needed
+    http_response_code(500);
+    echo json_encode([
+        'success' => false, 
+        'message' => 'Ocurrió un problema técnico. Por favor, intenta de nuevo en unos minutos.'
+    ]);
 }

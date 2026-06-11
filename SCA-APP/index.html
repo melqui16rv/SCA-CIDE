@@ -29,65 +29,91 @@
             <div class="card">
                 <div class="card-header">
                     <h2>Bienvenido a SCA-CIDE</h2>
-                    <p>Complete su registro de aprendiz</p>
+                    <p>Para comenzar, por favor ingresa tu número de documento de identidad</p>
                 </div>
                 <div class="card-body">
                     <form id="form-view1">
                         <div class="form-group">
-                            <label for="numero_documento">Número de Documento</label>
-                            <input type="text" id="numero_documento" placeholder="Ingrese su documento de identidad" required autocomplete="off">
+                            <label for="numero_documento">Número de Documento (sin puntos ni espacios)</label>
+                            <input type="text" id="numero_documento" placeholder="Ej: 1073123456" required autocomplete="off">
                             <small class="error-msg" id="error-doc-msg"></small>
                         </div>
-                        <button type="submit" class="btn btn-primary" id="btn-validate">Siguiente</button>
+                        <button type="submit" class="btn btn-primary" id="btn-validate">Continuar</button>
                     </form>
                 </div>
             </div>
         </div>
 
-        <!-- View 2: Registration Form -->
-        <div id="view2" class="view hidden" style="max-width: 1200px; margin: 0 auto; padding: 0 16px">
-            <div class="card " style="max-width: 100%; width: 100%;">
+        <!-- View 2: Registration Stepper -->
+        <div id="view2" class="view hidden" style="max-width: 800px; margin: 0 auto; padding: 0 16px">
+            <div class="card">
                 <div class="card-header">
-                    <h2>Actualización de Datos</h2>
-                    <p>Por favor complete la información faltante</p>
+                    <h2>Completa tu Registro</h2>
+                    <!-- Stepper Indicator -->
+                    <div class="stepper-indicator">
+                        <div class="step active" data-step="1">1</div>
+                        <div class="step-line"></div>
+                        <div class="step" data-step="2">2</div>
+                        <div class="step-line"></div>
+                        <div class="step" data-step="3">3</div>
+                        <div class="step-line"></div>
+                        <div class="step" data-step="4">4</div>
+                    </div>
+                    <p id="step-title" style="margin-top: 10px; font-weight: 600; color: var(--primary-color);">Paso 1: Confirma tus datos básicos</p>
                 </div>
-                <div class="card-body" style="max-width: 100%; width: 100%;" >
+                
+                <div class="card-body">
                     <form id="form-view2">
-                        <!-- Auto-completed data (read-only) -->
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Nombre Completo</label>
-                                <input type="text" id="nombre_completo" readonly class="input-readonly">
+                        <!-- Step 1: Data Confirmation -->
+                        <div class="step-content active" id="step-content-1">
+                            <div class="info-alert">
+                                💡 Por favor, verifica que tu Nombre Completo sea correcto. Si hay un error, contacta a tu centro.
+                                <br><br>
+                                <em>Nota: El Correo Electrónico y el Teléfono mostrados son de referencia, no te preocupes si no están actualizados.</em>
                             </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Correo Electrónico</label>
-                                <input type="email" id="correo" readonly class="input-readonly">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Nombre Completo</label>
+                                    <input type="text" id="nombre_completo" readonly class="input-readonly">
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label>Teléfono</label>
-                                <input type="text" id="telefono" readonly class="input-readonly">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Correo Electrónico</label>
+                                    <input type="email" id="correo" readonly class="input-readonly">
+                                </div>
+                                <div class="form-group">
+                                    <label>Teléfono</label>
+                                    <input type="text" id="telefono" readonly class="input-readonly">
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-secondary btn-back-v1">Volver</button>
+                                <button type="button" class="btn btn-primary btn-next-step">Mis datos son correctos</button>
                             </div>
                         </div>
 
-                        <!-- User inputs -->
+                        <!-- Step 2: Expedition Info -->
+                        <div class="step-content" id="step-content-2">
+                            <div class="form-section-title">Información de tu Documento</div>
+                            <p class="help-text">¿Dónde y cuándo te entregaron tu documento de identidad? (Revisa la parte trasera de tu documento para ver la fecha y lugar de expedición).</p>
+                            
                             <div class="form-group">
-                            <label>Fecha de Expedición del Documento</label>
-                            <div class="dp-wrap" id="dpWrap">
-                                <div class="dp-input" id="dpInput" tabindex="0">
-                                    <span id="dpDisplay" style="color: var(--text-muted);">AAAA / MM / DD</span>
-                                    <span style="margin-left:auto;">📅</span>
+                                <label>Fecha de Expedición</label>
+                                <div class="dp-wrap" id="dpWrap">
+                                    <div class="dp-input" id="dpInput" tabindex="0">
+                                        <span id="dpDisplay" style="color: var(--text-muted);">Selecciona Año / Mes / Día</span>
+                                        <span style="margin-left:auto;">📅</span>
                                     </div>
                                     <div class="dp-panel" id="dpPanel">
-                                    <div class="dp-header">
-                                        <div class="dp-nav">
-                                        <button type="button" id="dpPrev">&#8249;</button>
-                                        <button type="button" id="dpNext">&#8250;</button>
+                                        <div class="dp-header">
+                                            <div class="dp-nav">
+                                                <button type="button" id="dpPrev">&#8249;</button>
+                                                <button type="button" id="dpNext">&#8250;</button>
+                                            </div>
+                                            <span id="dpStepLabel">Selecciona el año</span>
                                         </div>
-                                        <span id="dpStepLabel">Selecciona el año</span>
-                                    </div>
-                                    <div class="dp-grid" id="dpGrid"></div>
+                                        <div class="dp-grid" id="dpGrid"></div>
                                     </div>
                                 </div>
                                 <input type="hidden" id="fecha_expedicion">
@@ -107,118 +133,105 @@
                                     <input type="checkbox" id="lugar_otro_check">
                                     <label for="lugar_otro_check" style="margin: 0; font-weight: normal; font-size: 0.85rem; cursor: pointer;">Otro (ej. Extranjería)</label>
                                 </div>
-                                <input type="text" id="lugar_expedicion" placeholder="Escriba el lugar de expedición" style="display: none;">
+                                <input type="text" id="lugar_expedicion" placeholder="Escribe el departamento y ciudad" style="display: none;">
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-secondary btn-prev-step">Atrás</button>
+                                <button type="button" class="btn btn-primary btn-next-step">Siguiente</button>
                             </div>
                         </div>
 
-                        <div class="form-section" id="camera-section">
-                            <h3>Archivos Requeridos</h3>
-                            <p class="help-text">Tomaremos las fotos necesarias directamente desde tu cámara para asegurar el formato correcto.</p>
+                        <!-- Step 3: Photo Capture -->
+                        <div class="step-content" id="step-content-3">
+                            <div class="form-section-title">Tu Fotografía</div>
+                            <p class="help-text">Tómate una foto de tu rostro (tipo carnet). Por favor, busca un lugar con buena luz y un fondo claro.</p>
                             
-                            <div class="media-status-container" id="media-files-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px;">
-                                <!-- Foto Aprendiz -->
-                                <div class="media-item" data-type="foto" style="background: var(--secondary-color); padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0;">
-                                    <div class="media-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                                        <span class="media-label" style="font-weight: 600; font-size: 0.95rem;">Foto Aprendiz</span>
-                                        <span id="badge-foto" class="badge pending">Pendiente</span>
-                                    </div>
-                                    <div class="media-preview-wrap" style="position: relative; margin-bottom: 12px;">
-                                        <div id="foto-preview-box" class="media-placeholder" style="background: #fff; height: 180px; border: 2px dashed #cbd5e1; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
-                                            <span class="media-icon" style="font-size: 2.5rem;">📸</span>
-                                        </div>
-                                    </div>
-                                    <div class="media-actions" style="display: flex; gap: 6px;">
-                                        <button type="button" class="btn-sm btn-primary" id="btn-capture-foto" style="flex: 1; padding: 8px; font-size: 0.85rem;">Capturar</button>
-                                        <button type="button" class="btn-sm btn-secondary" id="btn-delete-foto" style="flex: 1; padding: 8px; font-size: 0.85rem; display: none;">Eliminar</button>
-                                    </div>
+                            <div class="media-capture-card">
+                                <div id="foto-preview-box" class="media-placeholder big">
+                                    <span class="media-icon">📸</span>
+                                    <p>Presiona el botón para capturar tu foto</p>
                                 </div>
-                                
-                                <!-- Doc Frontal -->
-                                <div class="media-item" data-type="doc-front" style="background: var(--secondary-color); padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0;">
-                                    <div class="media-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                                        <span class="media-label" style="font-weight: 600; font-size: 0.95rem;">Doc. Frontal</span>
-                                        <span id="badge-doc-front" class="badge pending">Pendiente</span>
-                                    </div>
-                                    <div class="media-preview-wrap" style="position: relative; margin-bottom: 12px;">
-                                        <div id="doc-front-preview-box" class="media-placeholder" style="background: #fff; height: 180px; border: 2px dashed #cbd5e1; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
-                                            <span class="media-icon" style="font-size: 2.5rem;">🪪</span>
-                                        </div>
-                                    </div>
-                                    <div class="media-actions" style="display: flex; gap: 6px;">
-                                        <button type="button" class="btn-sm btn-primary" id="btn-capture-doc-front" style="flex: 1; padding: 8px; font-size: 0.85rem;">Capturar</button>
-                                        <button type="button" class="btn-sm btn-secondary" id="btn-delete-doc-front" style="flex: 1; padding: 8px; font-size: 0.85rem; display: none;">Eliminar</button>
-                                    </div>
+                                <div class="badge-status">
+                                    <span id="badge-foto" class="badge pending">Sin capturar</span>
                                 </div>
-                                
-                                <!-- Doc Reverso -->
-                                <div class="media-item" data-type="doc-back" style="background: var(--secondary-color); padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0;">
-                                    <div class="media-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                                        <span class="media-label" style="font-weight: 600; font-size: 0.95rem;">Doc. Reverso</span>
-                                        <span id="badge-doc-back" class="badge pending">Pendiente</span>
-                                    </div>
-                                    <div class="media-preview-wrap" style="position: relative; margin-bottom: 12px;">
-                                        <div id="doc-back-preview-box" class="media-placeholder" style="background: #fff; height: 180px; border: 2px dashed #cbd5e1; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
-                                            <span class="media-icon" style="font-size: 2.5rem;">🪪</span>
-                                        </div>
-                                    </div>
-                                    <div class="media-actions" style="display: flex; gap: 6px;">
-                                        <button type="button" class="btn-sm btn-primary" id="btn-capture-doc-back" style="flex: 1; padding: 8px; font-size: 0.85rem;">Capturar</button>
-                                        <button type="button" class="btn-sm btn-secondary" id="btn-delete-doc-back" style="flex: 1; padding: 8px; font-size: 0.85rem; display: none;">Eliminar</button>
-                                    </div>
+                                <div class="media-actions-main">
+                                    <button type="button" class="btn btn-primary" id="btn-capture-foto-wizard">
+                                        📷 Abrir Cámara
+                                    </button>
+                                    <button type="button" class="btn btn-secondary" id="btn-delete-foto-wizard" style="display: none;">Eliminar</button>
                                 </div>
                             </div>
+
+                            <div style="text-align: center; margin-top: 15px; font-size: 0.85rem;">
+                                ¿No puedes usar la cámara? <a href="#" class="btn-toggle-fallback" style="color: var(--primary-color);">Subir foto de galería</a>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-secondary btn-prev-step">Atrás</button>
+                                <button type="button" class="btn btn-primary btn-next-step">Siguiente</button>
+                            </div>
+                        </div>
+
+                        <!-- Step 4: Document Capture -->
+                        <div class="step-content" id="step-content-4">
+                            <div class="form-section-title">Documento de Identidad</div>
+                            <p class="help-text">Por favor, tómale una foto a tu documento de identidad original por ambos lados. Asegúrate de que se vea claro y que las letras se puedan leer.</p>
                             
-                            <button type="button" class="btn btn-primary" id="btn-open-camera" style="margin-bottom: 12px;">
-                                📷 Iniciar Captura de Cámara
-                            </button>
-                            
-                            <div style="text-align: center; font-size: 0.85rem;">
-                                ¿Problemas con la cámara? <a href="#" id="btn-fallback-upload" style="color: var(--primary-color);">Subir manualmente</a>
+                            <div class="docs-grid">
+                                <!-- Cara Frontal -->
+                                <div class="media-capture-card small">
+                                    <span class="media-label">Cara Frontal (Donde está tu foto)</span>
+                                    <div id="doc-front-preview-box" class="media-placeholder">
+                                        <span class="media-icon">🪪</span>
+                                    </div>
+                                    <div class="badge-status">
+                                        <span id="badge-doc-front" class="badge pending">Pendiente</span>
+                                    </div>
+                                    <button type="button" class="btn-sm btn-primary" id="btn-capture-doc-front-wizard">Capturar</button>
+                                </div>
+                                
+                                <!-- Cara Reverso -->
+                                <div class="media-capture-card small">
+                                    <span class="media-label">Cara Reverso (Lado del código)</span>
+                                    <div id="doc-back-preview-box" class="media-placeholder">
+                                        <span class="media-icon">🪪</span>
+                                    </div>
+                                    <div class="badge-status">
+                                        <span id="badge-doc-back" class="badge pending">Pendiente</span>
+                                    </div>
+                                    <button type="button" class="btn-sm btn-primary" id="btn-capture-doc-back-wizard">Capturar</button>
+                                </div>
+                            </div>
+
+                            <div style="text-align: center; margin-top: 15px; font-size: 0.85rem;">
+                                ¿Problemas con la cámara? <a href="#" class="btn-toggle-fallback" style="color: var(--primary-color);">Subir desde galería</a>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-secondary btn-prev-step">Atrás</button>
+                                <button type="submit" class="btn btn-primary" id="btn-submit">Finalizar Registro</button>
                             </div>
                         </div>
 
                         <!-- Fallback upload (hidden by default) -->
                         <div id="fallback-section" class="hidden">
                             <div class="form-section">
-                                <h3>Subida Manual de Documentos</h3>
-                                <p class="help-text">Sube los documentos requeridos en formato PNG o JPG.</p>
-                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
-                                    <!-- Foto Aprendiz -->
-                                    <div style="background: var(--secondary-color); padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0;">
-                                        <label for="foto_input" style="font-weight: 600; margin-bottom: 12px; display: block;">Foto Aprendiz</label>
-                                        <input type="file" id="foto_input" accept="image/png, image/jpeg" style="display: none;">
-                                        <div id="foto_preview_container" style="display: none; margin-bottom: 12px;">
-                                            <img id="foto_image" src="" class="doc-preview" style="width: 100%; border-radius: 6px;">
-                                        </div>
-                                        <button type="button" class="btn-sm btn-primary" onclick="document.getElementById('foto_input').click();" style="width: 100%;">📸 Seleccionar Foto</button>
-                                    </div>
+                                <h3>Subir fotos desde tu galería</h3>
+                                <p class="help-text">Si tienes problemas con la cámara, puedes subir las fotos que ya tengas guardadas en tu celular o computador.</p>
+                                <div class="fallback-inputs-grid">
+                                    <input type="file" id="foto_input" accept="image/png, image/jpeg" style="display: none;">
+                                    <input type="file" id="doc_front_input" accept="image/png, image/jpeg" style="display: none;">
+                                    <input type="file" id="doc_back_input" accept="image/png, image/jpeg" style="display: none;">
                                     
-                                    <!-- Doc Frontal -->
-                                    <div style="background: var(--secondary-color); padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0;">
-                                        <label for="doc_front_input" style="font-weight: 600; margin-bottom: 12px; display: block;">Doc. Lado Frontal</label>
-                                        <input type="file" id="doc_front_input" accept="image/png, image/jpeg" style="display: none;">
-                                        <div id="doc_front_preview_container" style="display: none; margin-bottom: 12px;">
-                                            <img id="doc_front_preview" src="" class="doc-preview" style="width: 100%; border-radius: 6px;">
-                                        </div>
-                                        <button type="button" class="btn-sm btn-primary" onclick="document.getElementById('doc_front_input').click();" style="width: 100%;">🪪 Seleccionar Doc</button>
-                                    </div>
-                                    
-                                    <!-- Doc Reverso -->
-                                    <div style="background: var(--secondary-color); padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0;">
-                                        <label for="doc_back_input" style="font-weight: 600; margin-bottom: 12px; display: block;">Doc. Lado Reverso</label>
-                                        <input type="file" id="doc_back_input" accept="image/png, image/jpeg" style="display: none;">
-                                        <div id="doc_back_preview_container" style="display: none; margin-bottom: 12px;">
-                                            <img id="doc_back_preview" src="" class="doc-preview" style="width: 100%; border-radius: 6px;">
-                                        </div>
-                                        <button type="button" class="btn-sm btn-primary" onclick="document.getElementById('doc_back_input').click();" style="width: 100%;">🪪 Seleccionar Doc</button>
-                                    </div>
+                                    <button type="button" class="btn-sm btn-secondary" onclick="document.getElementById('foto_input').click();">Subir foto de rostro</button>
+                                    <button type="button" class="btn-sm btn-secondary" onclick="document.getElementById('doc_front_input').click();">Subir frontal del documento</button>
+                                    <button type="button" class="btn-sm btn-secondary" onclick="document.getElementById('doc_back_input').click();">Subir reverso del documento</button>
+                                </div>
+                                <div style="text-align: center; margin-top: 15px;">
+                                    <button type="button" class="btn-sm btn-primary btn-close-fallback">Ocultar opciones de galería</button>
                                 </div>
                             </div>
-                        </div>
-
-                        <div class="form-actions">
-                            <button type="button" class="btn btn-secondary" id="btn-back">Volver</button>
-                            <button type="submit" class="btn btn-primary" id="btn-submit">Guardar Datos</button>
                         </div>
                     </form>
                 </div>
@@ -254,47 +267,38 @@
                     <h2>Gestión de Aprendices</h2>
                     <button type="button" class="btn btn-secondary" id="btn-logout">Cerrar Sesión</button>
                 </div>
-                <div class="card-body" style="width: 100%; overflow-x: auto;">
+                <div class="card-body">
                     <!-- Métricas Principales -->
-                    <div class="dashboard-metrics" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 24px;">
-                        <div class="metric-card" style="padding: 16px; background: var(--secondary-color); border-radius: 8px; text-align: center;">
-                            <h4 style="margin: 0; color: var(--text-muted); font-size: 0.85rem;">Total Registrados</h4>
-                            <p id="metric-total" style="font-size: 1.5rem; font-weight: 700; margin: 8px 0 0; color: var(--text-main);">0</p>
+                    <div class="dashboard-metrics">
+                        <div class="metric-card">
+                            <h4>Registrados</h4>
+                            <p id="metric-total">0</p>
                         </div>
-                        <div class="metric-card" style="padding: 16px; background: rgba(16, 185, 129, 0.1); border-radius: 8px; text-align: center;">
-                            <h4 style="margin: 0; color: var(--text-muted); font-size: 0.85rem;">Validados</h4>
-                            <p id="metric-validado" style="font-size: 1.5rem; font-weight: 700; margin: 8px 0 0; color: var(--success-color);">0</p>
+                        <div class="metric-card success">
+                            <h4>Validados</h4>
+                            <p id="metric-validado">0</p>
                         </div>
-                        <div class="metric-card" style="padding: 16px; background: rgba(239, 68, 68, 0.1); border-radius: 8px; text-align: center;">
-                            <h4 style="margin: 0; color: var(--text-muted); font-size: 0.85rem;">No Validados</h4>
-                            <p id="metric-no-validado" style="font-size: 1.5rem; font-weight: 700; margin: 8px 0 0; color: var(--error-color);">0</p>
+                        <div class="metric-card danger">
+                            <h4>Pendientes</h4>
+                            <p id="metric-no-validado">0</p>
                         </div>
-                        <div class="metric-card" style="padding: 16px; background: rgba(59, 130, 246, 0.1); border-radius: 8px; text-align: center;">
-                            <h4 style="margin: 0; color: var(--text-muted); font-size: 0.85rem;">Falta Foto</h4>
-                            <p id="metric-falta-foto" style="font-size: 1.5rem; font-weight: 700; margin: 8px 0 0; color: #3b82f6;">0</p>
-                        </div>
-                        <div class="metric-card" style="padding: 16px; background: rgba(244, 63, 94, 0.1); border-radius: 8px; text-align: center;">
-                            <h4 style="margin: 0; color: var(--text-muted); font-size: 0.85rem;">Falta Documento</h4>
-                            <p id="metric-falta-doc" style="font-size: 1.5rem; font-weight: 700; margin: 8px 0 0; color: #f43f5e;">0</p>
-                        </div>
-                        <div class="metric-card" style="padding: 16px; background: rgba(34, 197, 94, 0.1); border-radius: 8px; text-align: center;">
-                            <h4 style="margin: 0; color: var(--text-muted); font-size: 0.85rem;">Completos</h4>
-                            <p id="metric-completos" style="font-size: 1.5rem; font-weight: 700; margin: 8px 0 0; color: #22c55e;">0</p>
+                        <div class="metric-card warning">
+                            <h4>Faltan Fotos</h4>
+                            <p id="metric-incompletos">0</p>
                         </div>
                     </div>
 
                     <!-- Filtros y Búsqueda -->
-                    <div class="dashboard-filters" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 24px;">
-                        <input type="text" id="admin-search" placeholder="Buscar documento o nombre..." style="grid-column: span 2; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-family: var(--font-family); font-size: 0.95rem;">
-                        <select id="admin-filter" style="padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; outline: none; background: #fff; font-family: var(--font-family); font-size: 0.95rem;">
-                            <option value="todos">Todos</option>
+                    <div class="dashboard-filters">
+                        <input type="text" id="admin-search" placeholder="Buscar por documento o nombre...">
+                        <select id="admin-filter">
+                            <option value="todos">Todos los estados</option>
                             <option value="validado">✓ Validados</option>
                             <option value="no_validado">⏳ Pendientes</option>
                             <option value="completos">✓✓ Completos</option>
-                            <option value="falta_foto">Falta Foto</option>
-                            <option value="falta_doc">Falta Documento</option>
+                            <option value="incompletos">⚠️ Incompletos</option>
                         </select>
-                        <select id="admin-page-size" style="padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; outline: none; background: #fff; font-family: var(--font-family); font-size: 0.95rem;">
+                        <select id="admin-page-size">
                             <option value="10">10 registros</option>
                             <option value="50">50 registros</option>
                             <option value="100">100 registros</option>
@@ -302,14 +306,14 @@
                     </div>
 
                     <!-- Tabla -->
-                    <div class="table-responsive" style="border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">
-                        <table id="users-table" style="width: 100%;">
+                    <div class="table-responsive">
+                        <table id="users-table">
                             <thead>
                                 <tr>
-                                    <th style="min-width: 250px;">Documento / Nombre</th>
-                                    <th style="min-width: 180px;">Correo</th>
-                                    <th style="min-width: 120px;">Fotos</th>
-                                    <th style="min-width: 140px;">Validación</th>
+                                    <th>Aprendiz / Documento</th>
+                                    <th>Información de Contacto</th>
+                                    <th>Archivos</th>
+                                    <th>Estado de Validación</th>
                                 </tr>
                             </thead>
                             <tbody id="users-tbody">
@@ -319,10 +323,10 @@
                     </div>
 
                     <!-- Paginador -->
-                    <div id="pagination-container" class="pagination-container" style="display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: 24px; flex-wrap: wrap;">
-                        <button id="btn-prev-page" class="btn-sm btn-secondary" style="padding: 8px 12px; font-size: 0.9rem;">← Anterior</button>
-                        <div id="pagination-info" style="font-size: 0.9rem; color: var(--text-muted); min-width: 120px; text-align: center;">Página 1 de 1</div>
-                        <button id="btn-next-page" class="btn-sm btn-secondary" style="padding: 8px 12px; font-size: 0.9rem;">Siguiente →</button>
+                    <div id="pagination-container" class="pagination-container">
+                        <button id="btn-prev-page" class="btn-sm btn-secondary">← Anterior</button>
+                        <div id="pagination-info">Página 1 de 1</div>
+                        <button id="btn-next-page" class="btn-sm btn-secondary">Siguiente →</button>
                     </div>
                 </div>
             </div>
@@ -339,6 +343,7 @@
     <div id="cropper-modal" class="modal hidden">
         <div class="modal-content">
             <h3>Ajustar Fotografía</h3>
+            <p class="help-text">Ajusta el recuadro para que tu rostro quede centrado.</p>
             <div class="cropper-container">
                 <img id="cropper-image" src="" alt="Cropper">
             </div>
@@ -351,20 +356,15 @@
 
     <!-- Live Camera Modal -->
     <div id="camera-modal" class="modal hidden">
-        <div class="modal-content" style="max-width: 500px; padding: 16px; background: #111; color: #fff; border: 1px solid #333;">
-            <h3 id="camera-title" style="margin-top: 0; color: #fff; text-align: center; margin-bottom: 8px;">Capturar</h3>
-            <p id="camera-instructions" style="text-align: center; font-size: 0.9rem; color: #ccc; margin-bottom: 16px;">
-                Instrucciones
-            </p>
+        <div class="modal-content camera-modal-content">
+            <h3 id="camera-title">Capturar</h3>
+            <p id="camera-instructions">Instrucciones</p>
             
-            <div class="camera-wrapper" style="position: relative; width: 100%; background: #000; border-radius: 12px; overflow: hidden; display: flex; justify-content: center; align-items: center;">
-                <!-- Fixed aspect ratio container -->
-                <div style="position: relative; width: 100%; padding-bottom: 133.33%;"> <!-- 3:4 ratio -->
-                    <video id="camera-video" autoplay playsinline style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;"></video>
+            <div class="camera-wrapper">
+                <div class="camera-aspect-ratio">
+                    <video id="camera-video" autoplay playsinline></video>
                     
-                    <!-- SVG Stencil Overlay -->
-                    <svg id="camera-stencil" viewBox="0 0 300 400" preserveAspectRatio="xMidYMid slice" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10;">
-                        <!-- Defs for mask -->
+                    <svg id="camera-stencil" viewBox="0 0 300 400" preserveAspectRatio="xMidYMid slice">
                         <defs>
                             <mask id="stencil-mask">
                                 <rect width="100%" height="100%" fill="white" />
@@ -377,15 +377,16 @@
                 </div>
             </div>
             
-            <div class="modal-actions" style="margin-top: 24px; justify-content: center; gap: 24px;">
-                <button type="button" class="btn btn-secondary" id="btn-camera-cancel" style="border-color: #555; color: #fff; padding: 12px 24px;">Cancelar</button>
-                <button type="button" class="btn btn-primary" id="btn-camera-capture" style="background: #fff; color: #000; display: flex; align-items: center; justify-content: center; border-radius: 50%; width: 60px; height: 60px; padding: 0;">
-                    <span style="display: block; width: 48px; height: 48px; border-radius: 50%; border: 2px solid #000; background: #fff;"></span>
+            <div class="modal-actions camera-actions">
+                <button type="button" class="btn btn-secondary" id="btn-camera-cancel">Cancelar</button>
+                <button type="button" class="btn btn-primary btn-shutter" id="btn-camera-capture">
+                    <span></span>
                 </button>
             </div>
         </div>
     </div>
 
-    <script src="assets/js/app.js"></script>
+    <!-- Scripts organized as modules -->
+    <script type="module" src="assets/js/main.js"></script>
 </body>
 </html>

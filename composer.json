@@ -1,9 +1,0 @@
-{
-    "name": "cide/sca-cide",
-  "autoload": {
-    "psr-4": {
-        "App\\": "app/",
-        "Config\\": "config/"
-    }
-}
-}

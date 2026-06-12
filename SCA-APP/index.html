@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCA-CIDE - Registro de Aprendices</title>
+    <meta name="description" content="Formulario de registro fotográfico y documental para aprendices del SENA CIDE.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Lucide Icons (SVG icon library — cross-platform, no emojis) -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+    <!-- Cropper.js -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
+    <!-- jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <!-- Styles -->
+    <link href="assets/css/styles.css" rel="stylesheet">
+</head>
+<body>
+    <div class="background-overlay"></div>
+
+    <div class="container" id="app-container">
+
+        <!-- ══════════════════════════════════════════════════
+             Vista 1: Validación de Documento
+        ══════════════════════════════════════════════════ -->
+        <div id="view1" class="view active">
+            <div class="card card-sm">
+                <div class="card-header">
+                    <div class="brand-logo">
+                        <i data-lucide="shield-check"></i>
+                    </div>
+                    <h2>Bienvenido a SCA-CIDE</h2>
+                    <p>Ingresa tu número de documento para comenzar</p>
+                </div>
+                <div class="card-body">
+                    <form id="form-view1">
+                        <div class="form-group">
+                            <label for="numero_documento">Número de Documento</label>
+                            <div class="input-with-icon">
+                                <i data-lucide="credit-card"></i>
+                                <input type="text" id="numero_documento"
+                                    placeholder="Sin puntos ni espacios · Ej: 1073XXXXXX"
+                                    required autocomplete="off">
+                            </div>
+                            <small class="error-msg" id="error-doc-msg"></small>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-full" id="btn-validate">
+                            <i data-lucide="arrow-right"></i>
+                            Continuar
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════════
+             Vista 2: Stepper de Registro
+        ══════════════════════════════════════════════════ -->
+        <div id="view2" class="view hidden view-stepper">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Completa tu Registro</h2>
+                    <!-- Stepper Indicator -->
+                    <div class="stepper-indicator">
+                        <div class="step active" data-step="1">1</div>
+                        <div class="step-line"></div>
+                        <div class="step" data-step="2">2</div>
+                        <div class="step-line"></div>
+                        <div class="step" data-step="3">3</div>
+                        <div class="step-line"></div>
+                        <div class="step" data-step="4">4</div>
+                    </div>
+                    <p id="step-title" class="step-title-label">Paso 1: Confirma tus datos</p>
+                </div>
+
+                <div class="card-body">
+                    <form id="form-view2">
+
+                        <!-- ─── Paso 1: Confirmar datos ─────────────────── -->
+                        <div class="step-content active" id="step-content-1">
+
+                            <div class="info-alert">
+                                <i data-lucide="info" class="alert-icon"></i>
+                                <span>Verifica que tu <strong>Nombre Completo</strong> sea correcto. El correo y teléfono son solo de referencia y pueden no estar actualizados.</span>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Nombre Completo</label>
+                                <div class="input-with-icon">
+                                    <i data-lucide="user"></i>
+                                    <input type="text" id="nombre_completo" readonly class="input-readonly">
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>
+                                        Correo Electrónico
+                                        <span class="label-ref-badge">Referencia</span>
+                                    </label>
+                                    <div class="input-with-icon">
+                                        <i data-lucide="mail"></i>
+                                        <input type="email" id="correo" readonly class="input-readonly">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>
+                                        Teléfono
+                                        <span class="label-ref-badge">Referencia</span>
+                                    </label>
+                                    <div class="input-with-icon">
+                                        <i data-lucide="phone"></i>
+                                        <input type="text" id="telefono" readonly class="input-readonly">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-secondary btn-back-v1">
+                                    <i data-lucide="arrow-left"></i> Volver
+                                </button>
+                                <button type="button" class="btn btn-primary btn-next-step">
+                                    Mi nombre es correcto
+                                    <i data-lucide="check"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- ─── Paso 2: Expedición del documento ───────── -->
+                        <div class="step-content" id="step-content-2">
+
+                            <div class="step-intro">
+                                <i data-lucide="file-text" class="step-intro-icon"></i>
+                                <div>
+                                    <h3 class="step-intro-title">Información de Expedición</h3>
+                                    <p class="step-intro-sub">Revisa la parte trasera de tu cédula para ver la fecha y lugar.</p>
+                                </div>
+                            </div>
+
+                            <!-- Fecha -->
+                            <div class="form-group">
+                                <label>Fecha de Expedición</label>
+                                <div class="dp-wrap" id="dpWrap">
+                                    <div class="dp-input" id="dpInput" tabindex="0">
+                                        <i data-lucide="calendar" class="dp-icon"></i>
+                                        <span id="dpDisplay" class="dp-placeholder">Año / Mes / Día</span>
+                                        <i data-lucide="chevron-down" class="dp-chevron"></i>
+                                    </div>
+                                    <div class="dp-panel" id="dpPanel">
+                                        <div class="dp-header">
+                                            <div class="dp-nav">
+                                                <button type="button" id="dpPrev">&#8249;</button>
+                                                <button type="button" id="dpNext">&#8250;</button>
+                                            </div>
+                                            <span id="dpStepLabel">Selecciona el año</span>
+                                        </div>
+                                        <div class="dp-grid" id="dpGrid"></div>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="fecha_expedicion">
+                            </div>
+
+                            <!-- Lugar -->
+                            <div class="form-group" id="lugar_expedicion_container">
+                                <label>Lugar de Expedición</label>
+                                <div class="lugar-grid">
+                                    <select id="lugar_depto" class="select-lugar">
+                                        <option value="">Departamento</option>
+                                    </select>
+                                    <select id="lugar_ciudad" class="select-lugar" disabled>
+                                        <option value="">Ciudad</option>
+                                    </select>
+                                </div>
+                                <label class="check-label">
+                                    <input type="checkbox" id="lugar_otro_check">
+                                    <span>Expedido en el extranjero</span>
+                                </label>
+                                <input type="text" id="lugar_expedicion"
+                                    placeholder="Escribe el país o ciudad de expedición"
+                                    class="input-otro" style="display: none;">
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-secondary btn-prev-step">
+                                    <i data-lucide="arrow-left"></i> Atrás
+                                </button>
+                                <button type="button" class="btn btn-primary btn-next-step">
+                                    Siguiente <i data-lucide="arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- ─── Paso 3: Fotografía ─────────────────────── -->
+                        <div class="step-content" id="step-content-3">
+
+                            <div class="step-intro">
+                                <i data-lucide="camera" class="step-intro-icon"></i>
+                                <div>
+                                    <h3 class="step-intro-title">Tu Fotografía</h3>
+                                    <p class="step-intro-sub">Fondo claro, buena luz, expresión neutral. Sin gafas oscuras ni gorras.</p>
+                                </div>
+                            </div>
+
+                            <div class="media-capture-card" id="foto-card">
+                                <div id="foto-preview-box" class="media-placeholder big">
+                                    <i data-lucide="user-circle" class="media-icon-svg"></i>
+                                    <p>Presiona "Abrir Cámara" para tomar tu foto</p>
+                                </div>
+                                <div class="capture-footer">
+                                    <span id="badge-foto" class="badge pending">
+                                        <i data-lucide="clock"></i> Sin capturar
+                                    </span>
+                                    <div class="capture-actions">
+                                        <button type="button" class="btn btn-primary" id="btn-capture-foto-wizard">
+                                            <i data-lucide="camera"></i> Abrir Cámara
+                                        </button>
+                                        <button type="button" class="btn btn-ghost btn-icon" id="btn-delete-foto-wizard" style="display:none;" title="Eliminar foto">
+                                            <i data-lucide="trash-2"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="alt-upload-link">
+                                <i data-lucide="upload"></i>
+                                ¿No puedes usar la cámara?
+                                <label for="foto_input">Sube una foto de tu galería</label>
+                                <input type="file" id="foto_input" accept="image/png, image/jpeg" style="display:none;">
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-secondary btn-prev-step">
+                                    <i data-lucide="arrow-left"></i> Atrás
+                                </button>
+                                <button type="button" class="btn btn-primary btn-next-step">
+                                    Siguiente <i data-lucide="arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- ─── Paso 4: Documento de Identidad ────────── -->
+                        <div class="step-content" id="step-content-4">
+
+                            <div class="step-intro">
+                                <i data-lucide="credit-card" class="step-intro-icon"></i>
+                                <div>
+                                    <h3 class="step-intro-title">Documento de Identidad</h3>
+                                    <p class="step-intro-sub">Fotografía ambos lados. Acerca la cámara para que el documento llene el encuadre.</p>
+                                </div>
+                            </div>
+
+                            <!-- Tarjetas de captura -->
+                            <div class="docs-grid" id="docs-camera-section">
+
+                                <!-- Cara Frontal -->
+                                <div class="media-capture-card small">
+                                    <div class="doc-card-header">
+                                        <i data-lucide="scan-face"></i>
+                                        <span>Cara Frontal</span>
+                                    </div>
+                                    <div id="doc-front-preview-box" class="media-placeholder">
+                                        <i data-lucide="credit-card" class="media-icon-svg"></i>
+                                    </div>
+                                    <div class="capture-footer">
+                                        <span id="badge-doc-front" class="badge pending">
+                                            <i data-lucide="clock"></i> Pendiente
+                                        </span>
+                                        <div class="capture-actions">
+                                            <button type="button" class="btn-sm btn-primary" id="btn-capture-doc-front-wizard">
+                                                <i data-lucide="camera"></i> Capturar
+                                            </button>
+                                            <button type="button" class="btn-sm btn-ghost btn-icon" id="btn-delete-doc-front-wizard" style="display:none;" title="Eliminar">
+                                                <i data-lucide="trash-2"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Cara Reverso -->
+                                <div class="media-capture-card small">
+                                    <div class="doc-card-header">
+                                        <i data-lucide="scan"></i>
+                                        <span>Cara Reverso</span>
+                                    </div>
+                                    <div id="doc-back-preview-box" class="media-placeholder">
+                                        <i data-lucide="credit-card" class="media-icon-svg"></i>
+                                    </div>
+                                    <div class="capture-footer">
+                                        <span id="badge-doc-back" class="badge pending">
+                                            <i data-lucide="clock"></i> Pendiente
+                                        </span>
+                                        <div class="capture-actions">
+                                            <button type="button" class="btn-sm btn-primary" id="btn-capture-doc-back-wizard">
+                                                <i data-lucide="camera"></i> Capturar
+                                            </button>
+                                            <button type="button" class="btn-sm btn-ghost btn-icon" id="btn-delete-doc-back-wizard" style="display:none;" title="Eliminar">
+                                                <i data-lucide="trash-2"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- PDF cargado exitosamente -->
+                            <div id="doc-pdf-success-section" class="pdf-success-card" style="display:none;">
+                                <div class="pdf-success-icon">
+                                    <i data-lucide="file-check"></i>
+                                </div>
+                                <div class="pdf-success-body">
+                                    <p class="pdf-success-title">PDF cargado correctamente</p>
+                                    <p id="doc-pdf-filename" class="pdf-success-name"></p>
+                                </div>
+                                <button type="button" class="btn-sm btn-ghost" id="btn-remove-pdf">
+                                    <i data-lucide="x"></i> Quitar
+                                </button>
+                            </div>
+
+                            <!-- Alternativa: subir PDF -->
+                            <div class="alt-upload-link" id="doc-pdf-upload-hint">
+                                <i data-lucide="file-up"></i>
+                                ¿No tienes el documento físico?
+                                <label for="doc_pdf_input">Sube el PDF de tu documento</label>
+                                <input type="file" id="doc_pdf_input" accept="application/pdf" style="display:none;">
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-secondary btn-prev-step">
+                                    <i data-lucide="arrow-left"></i> Atrás
+                                </button>
+                                <button type="submit" class="btn btn-success" id="btn-submit">
+                                    <i data-lucide="send"></i> Finalizar Registro
+                                </button>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════════
+             Vista 3: Admin Login
+        ══════════════════════════════════════════════════ -->
+        <div id="admin-login" class="view hidden">
+            <div class="card card-sm">
+                <div class="card-header">
+                    <div class="brand-logo brand-logo--warning">
+                        <i data-lucide="lock"></i>
+                    </div>
+                    <h2>Acceso Administrativo</h2>
+                    <p>Ingresa tu contraseña para continuar</p>
+                </div>
+                <div class="card-body">
+                    <form id="form-admin-login">
+                        <div class="form-group">
+                            <label for="admin_password">Contraseña</label>
+                            <div class="input-with-icon">
+                                <i data-lucide="key"></i>
+                                <input type="password" id="admin_password" required>
+                            </div>
+                            <small class="error-msg" id="admin-error-msg"></small>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" id="btn-admin-cancel">
+                                Cancelar
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i data-lucide="log-in"></i> Ingresar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════════
+             Vista 4: Admin Dashboard
+        ══════════════════════════════════════════════════ -->
+        <div id="admin-dashboard" class="view hidden">
+            <div class="card dashboard-card">
+                <div class="card-header dashboard-header">
+                    <h2>Gestión de Aprendices</h2>
+                    <button type="button" class="btn btn-secondary btn-sm" id="btn-logout">
+                        <i data-lucide="log-out"></i> Cerrar Sesión
+                    </button>
+                </div>
+                <div class="card-body">
+
+                    <!-- Métricas -->
+                    <div class="dashboard-metrics">
+                        <div class="metric-card">
+                            <div class="metric-icon"><i data-lucide="users"></i></div>
+                            <h4>Registrados</h4>
+                            <p id="metric-total">0</p>
+                        </div>
+                        <div class="metric-card success">
+                            <div class="metric-icon"><i data-lucide="check-circle"></i></div>
+                            <h4>Validados</h4>
+                            <p id="metric-validado">0</p>
+                        </div>
+                        <div class="metric-card danger">
+                            <div class="metric-icon"><i data-lucide="clock"></i></div>
+                            <h4>Pendientes</h4>
+                            <p id="metric-no-validado">0</p>
+                        </div>
+                        <div class="metric-card warning">
+                            <div class="metric-icon"><i data-lucide="image-off"></i></div>
+                            <h4>Sin Foto</h4>
+                            <p id="metric-incompletos">0</p>
+                        </div>
+                    </div>
+
+                    <!-- Filtros -->
+                    <div class="dashboard-filters">
+                        <div class="input-with-icon">
+                            <i data-lucide="search"></i>
+                            <input type="text" id="admin-search" placeholder="Buscar por documento o nombre...">
+                        </div>
+                        <select id="admin-filter">
+                            <option value="todos">Todos los estados</option>
+                            <option value="validado">Validados</option>
+                            <option value="no_validado">Pendientes</option>
+                            <option value="completos">Completos</option>
+                            <option value="incompletos">Incompletos</option>
+                        </select>
+                        <select id="admin-page-size">
+                            <option value="10">10 registros</option>
+                            <option value="50">50 registros</option>
+                            <option value="100">100 registros</option>
+                        </select>
+                    </div>
+
+                    <!-- Tabla -->
+                    <div class="table-responsive">
+                        <table id="users-table">
+                            <thead>
+                                <tr>
+                                    <th>Aprendiz / Documento</th>
+                                    <th>Contacto</th>
+                                    <th>Archivos</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-tbody"></tbody>
+                        </table>
+                    </div>
+
+                    <!-- Paginador -->
+                    <div id="pagination-container" class="pagination-container">
+                        <button id="btn-prev-page" class="btn-sm btn-secondary">
+                            <i data-lucide="chevron-left"></i> Anterior
+                        </button>
+                        <div id="pagination-info">Página 1 de 1</div>
+                        <button id="btn-next-page" class="btn-sm btn-secondary">
+                            Siguiente <i data-lucide="chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div id="loading-overlay" class="hidden">
+            <div class="spinner"></div>
+            <p id="loading-text">Procesando...</p>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════
+         Modal: Recorte de imagen (Cropper)
+    ══════════════════════════════════════════════════ -->
+    <div id="cropper-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Ajustar imagen</h3>
+            <p class="help-text" id="cropper-hint">Ajusta el recuadro para que tu rostro quede centrado.</p>
+            <div class="cropper-container">
+                <img id="cropper-image" src="" alt="Recorte">
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" id="btn-crop-cancel">
+                    <i data-lucide="x"></i> Cancelar
+                </button>
+                <button type="button" class="btn btn-primary" id="btn-crop-confirm">
+                    <i data-lucide="check"></i> Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════
+         Modal: Cámara en vivo
+    ══════════════════════════════════════════════════ -->
+    <div id="camera-modal" class="modal hidden">
+        <div class="modal-content camera-modal-content">
+            <h3 id="camera-title">Capturar</h3>
+            <p id="camera-instructions" class="camera-hint">Instrucciones</p>
+
+            <div class="camera-wrapper">
+                <div class="camera-aspect-ratio">
+                    <video id="camera-video" autoplay playsinline></video>
+
+                    <!-- Stencil oval (foto carnet) -->
+                    <svg id="camera-stencil" viewBox="0 0 300 400" preserveAspectRatio="xMidYMid slice">
+                        <defs>
+                            <mask id="stencil-mask">
+                                <rect width="100%" height="100%" fill="white"/>
+                                <path id="stencil-path" d="" fill="black"/>
+                            </mask>
+                        </defs>
+                        <rect width="100%" height="100%" fill="rgba(0,0,0,0.6)" mask="url(#stencil-mask)"/>
+                        <path id="stencil-border" d="" fill="none" stroke="#10b981" stroke-width="3" stroke-dasharray="10 5"/>
+                    </svg>
+
+                    <!-- Guía de documento (cara frontal / reverso) -->
+                    <div id="doc-camera-guide" class="doc-camera-guide hidden">
+                        <div class="doc-guide-frame">
+                            <div class="doc-corner top-left"></div>
+                            <div class="doc-corner top-right"></div>
+                            <div class="doc-corner bottom-left"></div>
+                            <div class="doc-corner bottom-right"></div>
+                            <span class="doc-guide-label" id="doc-guide-label">Centra el documento aquí</span>
+                        </div>
+                        <div class="doc-guide-tips">
+                            <i data-lucide="maximize-2" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;"></i>
+                            Acerca la cámara hasta que el documento llene el recuadro
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-actions camera-actions">
+                <button type="button" class="btn btn-secondary" id="btn-camera-cancel">
+                    <i data-lucide="x"></i> Cancelar
+                </button>
+                <button type="button" class="btn-shutter" id="btn-camera-capture" title="Capturar">
+                    <span class="shutter-inner"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════
+         Modal: Confirmación de sobreescritura de datos
+    ══════════════════════════════════════════════════ -->
+    <div id="overwrite-modal" class="modal hidden">
+        <div class="modal-content overwrite-modal-content">
+            <div class="overwrite-icon">
+                <i data-lucide="alert-triangle"></i>
+            </div>
+            <h3>Ya tienes un registro</h3>
+            <p class="overwrite-body">
+                Encontramos que ya enviaste tus datos anteriormente.<br>
+                Si continúas, <strong>tu foto y documento anteriores serán reemplazados</strong>
+                con los que captures ahora.
+            </p>
+            <p class="overwrite-sub">¿Deseas continuar y actualizar tu registro?</p>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" id="btn-overwrite-cancel">
+                    <i data-lucide="x"></i> Cancelar
+                </button>
+                <button type="button" class="btn btn-warning" id="btn-overwrite-confirm">
+                    <i data-lucide="refresh-cw"></i> Sí, actualizar mis datos
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="assets/js/main.js"></script>
+    <script>
+        // Initialize Lucide icons after DOM is ready
+        document.addEventListener('DOMContentLoaded', () => lucide.createIcons());
+    </script>
+</body>
+</html>

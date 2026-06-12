@@ -1,39 +1,53 @@
 /* ══════════════════════════════════════════════════════════════
    SCA-CIDE · styles.css
    Design system: Inter + Lucide Icons + glassmorphism subtle
+   Paleta institucional SENA · Verde como color primario
 ══════════════════════════════════════════════════════════════ */
 
 /* ── Tokens ─────────────────────────────────────────────── */
 :root {
-    --primary:        #2563eb;
-    --primary-hover:  #1d4ed8;
-    --primary-light:  rgba(37, 99, 235, 0.08);
-    --success:        #10b981;
-    --success-light:  rgba(16, 185, 129, 0.08);
-    --success-hover:  #059669;
+    /* ── Color primario: Verde SENA institucional ── */
+    --primary:        #1a7a3c;
+    --primary-hover:  #145e2e;
+    --primary-light:  rgba(26, 122, 60, 0.08);
+
+    /* ── Acento secundario: Verde más brillante para highlights ── */
+    --accent:         #22c55e;
+    --accent-light:   rgba(34, 197, 94, 0.10);
+
+    /* ── Success (verde esmeralda, diferenciado del primario) ── */
+    --success:        #059669;
+    --success-light:  rgba(5, 150, 105, 0.08);
+    --success-hover:  #047857;
+
+    /* ── Warning & Danger ── */
     --warning:        #f59e0b;
     --warning-light:  rgba(245, 158, 11, 0.10);
     --danger:         #ef4444;
     --danger-light:   rgba(239, 68, 68, 0.08);
 
-    --text-main:  #1e293b;
-    --text-sub:   #475569;
-    --text-muted: #94a3b8;
+    /* ── Tipografía ── */
+    --text-main:  #1a2e1a;
+    --text-sub:   #3d5c3d;
+    --text-muted: #7a9e7a;
 
-    --border:     #e2e8f0;
-    --bg-input:   #f8fafc;
-    --bg-card:    rgba(255,255,255,0.88);
-    --bg-card-border: rgba(255,255,255,0.35);
-    --card-shadow: 0 8px 32px rgba(31,38,135,0.07);
+    /* ── Superficies ── */
+    --border:          #d1e7d1;
+    --bg-input:        #f3faf3;
+    --bg-card:         rgba(255, 255, 255, 0.90);
+    --bg-card-border:  rgba(255, 255, 255, 0.40);
+    --card-shadow:     0 8px 32px rgba(26, 122, 60, 0.08);
 
+    /* ── Radios ── */
     --radius-sm: 10px;
     --radius:    16px;
     --radius-lg: 20px;
 
+    /* ── Fuente y transición ── */
     --font: 'Inter', sans-serif;
     --ease: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
-    /* Icon sizes used inline */
+    /* ── Iconos ── */
     --icon-sm: 14px;
     --icon-md: 18px;
     --icon-lg: 22px;
@@ -46,7 +60,7 @@ body {
     font-family: var(--font);
     color: var(--text-main);
     min-height: 100vh;
-    background: linear-gradient(135deg, #e0e7ff 0%, #f0f9ff 50%, #f8fafc 100%);
+    background: linear-gradient(135deg, #e6f4ec 0%, #f0faf4 50%, #f8fdf9 100%);
     padding: 20px 16px 40px;
     line-height: 1.55;
 }
@@ -55,8 +69,8 @@ body {
 .background-overlay {
     position: fixed; inset: 0; z-index: -1;
     background:
-        radial-gradient(circle at 15% 50%, rgba(37,99,235,0.07) 0%, transparent 40%),
-        radial-gradient(circle at 85% 20%, rgba(16,185,129,0.07) 0%, transparent 35%);
+        radial-gradient(circle at 15% 50%, rgba(26, 122, 60, 0.07) 0%, transparent 40%),
+        radial-gradient(circle at 85% 20%, rgba(34, 197, 94, 0.07) 0%, transparent 35%);
 }
 
 /* ── Layout ──────────────────────────────────────────────── */
@@ -75,22 +89,20 @@ body {
     border: 1px solid var(--bg-card-border);
     border-radius: var(--radius-lg);
     box-shadow: var(--card-shadow);
-    /* overflow: visible — allows dropdowns (datepicker) to overflow the card */
     overflow: visible;
     animation: fadeInUp 0.35s ease-out;
 }
-/* Clip header top-corners without full card overflow:hidden */
 .card-header {
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
 
-/* Narrow card (view1, admin-login) */
+/* Narrow card */
 .card-sm {
     max-width: 440px;
     margin: 0 auto;
 }
 
-/* Stepper card max width */
+/* Stepper card */
 .view-stepper { max-width: 680px; margin: 0 auto; }
 
 .card-header {
@@ -110,7 +122,7 @@ body {
 
 .card-body { padding: 28px 32px 32px; }
 
-/* Brand logo icon in header */
+/* Brand logo */
 .brand-logo {
     width: 52px; height: 52px;
     background: var(--primary-light);
@@ -144,7 +156,7 @@ body {
     background: var(--primary);
     border-color: var(--primary);
     color: #fff;
-    box-shadow: 0 0 0 4px rgba(37,99,235,0.15);
+    box-shadow: 0 0 0 4px rgba(26, 122, 60, 0.15);
 }
 .step.completed {
     background: var(--success);
@@ -179,7 +191,7 @@ body {
     transform: translateY(0);
 }
 
-/* ── Step intro header (icon + title + subtitle) ─────────── */
+/* ── Step intro ──────────────────────────────────────────── */
 .step-intro {
     display: flex;
     align-items: center;
@@ -212,7 +224,7 @@ body {
     align-items: flex-start;
     gap: 10px;
     background: var(--primary-light);
-    border: 1px solid rgba(37,99,235,0.12);
+    border: 1px solid rgba(26, 122, 60, 0.15);
     padding: 12px 14px;
     border-radius: var(--radius-sm);
     font-size: 0.87rem;
@@ -242,10 +254,8 @@ label {
     color: var(--text-main);
 }
 
-/* Input with leading icon */
-.input-with-icon {
-    position: relative;
-}
+/* Input con ícono */
+.input-with-icon { position: relative; }
 .input-with-icon > svg {
     position: absolute;
     left: 13px;
@@ -256,7 +266,6 @@ label {
     pointer-events: none;
     z-index: 1;
 }
-/* !important overrides the generic input[type=...] padding rule */
 .input-with-icon input[type="text"],
 .input-with-icon input[type="email"],
 .input-with-icon input[type="password"] {
@@ -281,7 +290,7 @@ select {
 }
 input:focus, select:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(37,99,235,0.10);
+    box-shadow: 0 0 0 3px rgba(26, 122, 60, 0.10);
 }
 
 .input-readonly {
@@ -301,7 +310,7 @@ input:focus, select:focus {
     letter-spacing: 0.06em;
     color: #92400e;
     background: var(--warning-light);
-    border: 1px solid rgba(245,158,11,0.3);
+    border: 1px solid rgba(245, 158, 11, 0.3);
     border-radius: 20px;
     padding: 1px 7px;
     margin-left: 5px;
@@ -323,7 +332,7 @@ input:focus, select:focus {
 }
 .lugar-grid select { flex: 1; }
 
-/* Custom checkbox label */
+/* Custom checkbox */
 .check-label {
     display: inline-flex;
     align-items: center;
@@ -373,12 +382,10 @@ input:focus, select:focus {
     box-shadow: 0 12px 32px rgba(0,0,0,0.13);
     z-index: 500;
     display: none;
-    /* Allow internal scroll on very small screens */
     max-height: 380px;
     overflow-y: auto;
 }
 .dp-panel.open { display: block; animation: slideDown 0.18s ease-out; overflow-y: visible; }
-
 
 .dp-header {
     display: flex; align-items: center; justify-content: space-between;
@@ -441,18 +448,16 @@ input:focus, select:focus {
 .btn-full { width: 100%; }
 
 .btn-primary { background: var(--primary); color: #fff; }
-.btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.22); }
+.btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(26, 122, 60, 0.28); }
 
 .btn-success { background: var(--success); color: #fff; }
-.btn-success:hover { background: var(--success-hover); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(16,185,129,0.22); }
+.btn-success:hover { background: var(--success-hover); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(5, 150, 105, 0.28); }
 
 .btn-warning { background: var(--warning); color: #fff; }
-.btn-warning:hover { background: #d97706; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(245,158,11,0.28); }
+.btn-warning:hover { background: #d97706; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(245, 158, 11, 0.28); }
 
-/* ── Overwrite confirmation modal ────────────────────── */
-.overwrite-modal-content {
-    padding: 32px 28px;
-}
+/* ── Overwrite modal ─────────────────────────────────────── */
+.overwrite-modal-content { padding: 32px 28px; }
 .overwrite-icon {
     width: 60px; height: 60px;
     background: var(--warning-light);
@@ -481,7 +486,7 @@ input:focus, select:focus {
     color: var(--text-main);
     border-color: var(--border);
 }
-.btn-secondary:hover { background: var(--bg-input); border-color: #cbd5e1; }
+.btn-secondary:hover { background: var(--bg-input); border-color: #a8c9a8; }
 
 .btn-ghost {
     background: transparent;
@@ -496,7 +501,7 @@ input:focus, select:focus {
 }
 .btn-icon svg { width: 16px; height: 16px; }
 
-/* Small buttons */
+/* Botones pequeños */
 .btn-sm {
     display: inline-flex;
     align-items: center;
@@ -520,7 +525,7 @@ input:focus, select:focus {
 .btn-sm.btn-ghost:hover { background: var(--danger-light); color: var(--danger); }
 .btn-sm.btn-icon { padding: 7px; }
 
-/* Form actions row */
+/* Form actions */
 .form-actions {
     display: flex;
     gap: 12px;
@@ -542,7 +547,7 @@ input:focus, select:focus {
     width: 100%;
     height: 160px;
     background: var(--bg-input);
-    border: 2px dashed #cbd5e1;
+    border: 2px dashed #a8c9a8;
     border-radius: var(--radius-sm);
     display: flex;
     flex-direction: column;
@@ -567,29 +572,27 @@ input:focus, select:focus {
     border-radius: var(--radius-sm);
 }
 
-/* ── Foto carnet preview: mostrar la imagen portrait completa ── */
-/* Override the fixed height so the 3:4 portrait photo isn't cropped */
+/* Foto carnet preview */
 #foto-preview-box.has-image {
-    height: auto;           /* Let the image set its own height  */
+    height: auto;
     min-height: unset;
 }
 #foto-preview-box.has-image img {
     width: 100%;
-    height: auto;           /* Natural height — no fixed container cutting it */
-    max-height: 360px;      /* Reasonable cap so it doesn't overflow the card */
-    object-fit: contain;    /* Show full image — no cropping */
-    background: #f8fafc;    /* Subtle fill behind any letterbox space */
+    height: auto;
+    max-height: 360px;
+    object-fit: contain;
+    background: var(--bg-input);
     border-radius: var(--radius-sm);
 }
-
 
 /* SVG icons inside placeholders */
 .media-icon-svg {
     width: 44px; height: 44px;
-    color: #cbd5e1;
+    color: #a8c9a8;
 }
 
-/* Capture footer: badge + actions */
+/* Capture footer */
 .capture-footer {
     display: flex;
     align-items: center;
@@ -603,7 +606,7 @@ input:focus, select:focus {
     gap: 6px;
 }
 
-/* Docs 2-column grid */
+/* Docs grid */
 .docs-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -611,7 +614,6 @@ input:focus, select:focus {
     margin-bottom: 16px;
 }
 
-/* Doc card header (icon + label) */
 .doc-card-header {
     display: flex;
     align-items: center;
@@ -678,7 +680,7 @@ input:focus, select:focus {
 }
 .pdf-success-icon {
     width: 36px; height: 36px;
-    background: rgba(16,185,129,0.15);
+    background: rgba(5, 150, 105, 0.15);
     border-radius: 9px;
     display: flex; align-items: center; justify-content: center;
     color: var(--success);
@@ -689,7 +691,7 @@ input:focus, select:focus {
 .pdf-success-title { font-weight: 600; font-size: 0.88rem; color: var(--success); }
 .pdf-success-name { font-size: 0.78rem; color: var(--text-sub); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-/* ── Shutter button (camera modal) ──────────────────────── */
+/* ── Shutter button ──────────────────────────────────────── */
 .btn-shutter {
     width: 66px; height: 66px;
     border-radius: 50%;
@@ -706,13 +708,13 @@ input:focus, select:focus {
     width: 50px; height: 50px;
     border-radius: 50%;
     background: #fff;
-    border: 2.5px solid #1e293b;
+    border: 2.5px solid var(--text-main);
 }
 .btn-shutter:active { transform: scale(0.88); }
 
 /* ── Camera Modal ────────────────────────────────────────── */
 .camera-modal-content {
-    background: #0f172a;
+    background: #0d1f0d;
     color: #fff;
     max-width: 560px;
     width: 95%;
@@ -731,7 +733,7 @@ input:focus, select:focus {
 .camera-aspect-ratio {
     position: relative;
     width: 100%;
-    padding-bottom: 133.33%; /* 3:4 */
+    padding-bottom: 133.33%;
 }
 .camera-aspect-ratio.doc-mode { padding-bottom: 67%; }
 
@@ -766,14 +768,14 @@ input:focus, select:focus {
     position: relative;
     width: 88%;
     aspect-ratio: 1.586 / 1;
-    border: 2px solid rgba(16,185,129,0.25);
+    border: 2px solid rgba(26, 122, 60, 0.30);
     border-radius: 10px;
 }
 
 .doc-corner {
     position: absolute;
     width: 22px; height: 22px;
-    border-color: #10b981;
+    border-color: var(--primary);
     border-style: solid;
     animation: cornerPulse 1.8s ease-in-out infinite;
 }
@@ -794,7 +796,7 @@ input:focus, select:focus {
     white-space: nowrap;
     font-size: 0.7rem;
     font-weight: 600;
-    color: #10b981;
+    color: var(--accent);
     background: rgba(0,0,0,0.55);
     padding: 3px 10px;
     border-radius: 20px;
@@ -813,7 +815,7 @@ input:focus, select:focus {
 /* ── Modals (shared) ─────────────────────────────────────── */
 .modal {
     position: fixed; inset: 0;
-    background: rgba(0,0,0,0.55);
+    background: rgba(0, 0, 0, 0.55);
     backdrop-filter: blur(5px);
     z-index: 500;
     display: flex; align-items: center; justify-content: center;
@@ -918,6 +920,9 @@ input:focus, select:focus {
 .metric-card.danger p { color: var(--danger); }
 .metric-card.warning .metric-icon { background: var(--warning-light); color: var(--warning); }
 .metric-card.warning p { color: var(--warning); }
+/* Métrica primaria verde SENA */
+.metric-card.primary .metric-icon { background: var(--primary-light); color: var(--primary); }
+.metric-card.primary p { color: var(--primary); }
 
 .dashboard-filters {
     display: grid;
@@ -934,7 +939,14 @@ input:focus, select:focus {
 }
 table { width: 100%; border-collapse: collapse; }
 th, td { padding: 13px 16px; text-align: left; border-bottom: 1px solid #f1f5f9; }
-th { background: var(--bg-input); font-weight: 700; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.04em; }
+th {
+    background: var(--bg-input);
+    font-weight: 700;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+}
 tr:last-child td { border-bottom: none; }
 tr:hover td { background: var(--bg-input); }
 

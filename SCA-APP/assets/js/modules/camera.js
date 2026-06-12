@@ -117,7 +117,7 @@ const Camera = {
         const ratio  = isDoc ? 1.586 : (3 / 4);  // cédula ratio vs carnet ratio
 
         // Update the cropper modal help text dynamically
-        const cropperHint = document.querySelector('#cropper-modal .help-text');
+        const cropperHint = document.getElementById('cropper-hint');
         if (cropperHint) {
             cropperHint.textContent = isDoc
                 ? 'Asegúrate de que los cuatro bordes del documento sean visibles. El recuadro ya tiene la proporción correcta.'

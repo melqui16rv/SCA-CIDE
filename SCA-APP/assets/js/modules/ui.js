@@ -14,37 +14,32 @@ const UI = {
     },
 
     stepTitles: {
-        1: 'Paso 1: Confirma tus datos básicos',
-        2: 'Paso 2: Información de tu documento',
-        3: 'Paso 3: Tu Fotografía estilo carnet',
-        4: 'Paso 4: Fotos de tu documento'
+        1: 'Paso 1: Confirma tus datos',
+        2: 'Paso 2: Expedición del documento',
+        3: 'Paso 3: Tu fotografía carnet',
+        4: 'Paso 4: Documento de identidad'
     },
 
-    /**
-     * Shows a specific view and hides others
-     */
+    /** Shows a specific view and hides others */
     showView(viewId) {
         const targetView = document.getElementById(viewId);
         if (!targetView) return;
 
         this.elements.views.forEach(v => {
             v.classList.remove('active');
-            setTimeout(() => { if(!v.classList.contains('active')) v.classList.add('hidden'); }, 300);
+            setTimeout(() => { if (!v.classList.contains('active')) v.classList.add('hidden'); }, 300);
         });
 
         targetView.classList.remove('hidden');
         setTimeout(() => targetView.classList.add('active'), 50);
     },
 
-    /**
-     * Handles Stepper Navigation
-     */
+    /** Handles Stepper Navigation */
     goToStep(stepNumber) {
         this.elements.steps.forEach((s, idx) => {
             s.classList.toggle('active', (idx + 1) === stepNumber);
         });
 
-        // Update Stepper Indicator
         this.elements.stepperSteps.forEach((s, idx) => {
             const num = idx + 1;
             s.classList.toggle('active', num === stepNumber);
@@ -77,11 +72,14 @@ const UI = {
 
         if (status === 'success') {
             badge.className = 'badge success';
-            badge.textContent = '✓ Capturado';
+            badge.innerHTML = `<i data-lucide="check-circle"></i> Capturado`;
         } else {
             badge.className = 'badge pending';
-            badge.textContent = 'Pendiente';
+            badge.innerHTML = `<i data-lucide="clock"></i> Pendiente`;
         }
+
+        // Re-render Lucide icons inside the badge
+        if (typeof lucide !== 'undefined') lucide.createIcons();
     }
 };
 

@@ -25,7 +25,9 @@ try {
             numero_documento_aprendiz, 
             nombre_completo_aprendiz, 
             correo_electronico_aprendiz, 
-            telefono_aprendiz 
+            telefono_aprendiz,
+            ruta_foto_aprendiz,
+            ruta_documento_identificacion_aprendiz
         FROM sca_cide_aprendices 
         WHERE numero_documento_aprendiz = ?
     ');
@@ -33,7 +35,19 @@ try {
     $aprendiz = $stmt->fetch();
 
     if ($aprendiz) {
-        echo json_encode(['success' => true, 'data' => $aprendiz]);
+        // Detect if user already has a previous registration
+        $tiene_registro = !empty($aprendiz['ruta_foto_aprendiz']) || 
+                          !empty($aprendiz['ruta_documento_identificacion_aprendiz']);
+        echo json_encode([
+            'success'         => true,
+            'tiene_registro'  => $tiene_registro,
+            'data'            => [
+                'numero_documento_aprendiz'  => $aprendiz['numero_documento_aprendiz'],
+                'nombre_completo_aprendiz'   => $aprendiz['nombre_completo_aprendiz'],
+                'correo_electronico_aprendiz'=> $aprendiz['correo_electronico_aprendiz'],
+                'telefono_aprendiz'          => $aprendiz['telefono_aprendiz']
+            ]
+        ]);
     } else {
         echo json_encode([
             'success' => false, 

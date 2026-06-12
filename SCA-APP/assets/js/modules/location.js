@@ -9,7 +9,7 @@ const Location = {
         ciudad: document.getElementById('lugar_ciudad'),
         otroCheck: document.getElementById('lugar_otro_check'),
         input: document.getElementById('lugar_expedicion'),
-        controls: document.querySelector('.lugar-controls')
+        controls: document.querySelector('.lugar-grid')   // updated: was '.lugar-controls'
     },
 
     async init() {

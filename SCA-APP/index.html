@@ -79,17 +79,19 @@
                             </div>
                             <div class="form-row">
                                 <div class="form-group">
-                                    <label>Correo Electrónico</label>
+                                    <label>Correo Electrónico <span class="label-ref-badge">Solo referencia</span></label>
                                     <input type="email" id="correo" readonly class="input-readonly">
+                                    <small class="ref-hint">Este dato puede no estar actualizado, no te preocupes.</small>
                                 </div>
                                 <div class="form-group">
-                                    <label>Teléfono</label>
+                                    <label>Teléfono <span class="label-ref-badge">Solo referencia</span></label>
                                     <input type="text" id="telefono" readonly class="input-readonly">
+                                    <small class="ref-hint">Este dato puede no estar actualizado, no te preocupes.</small>
                                 </div>
                             </div>
                             <div class="form-actions">
                                 <button type="button" class="btn btn-secondary btn-back-v1">Volver</button>
-                                <button type="button" class="btn btn-primary btn-next-step">Mis datos son correctos</button>
+                                <button type="button" class="btn btn-primary btn-next-step">Mi nombre es correcto ✓</button>
                             </div>
                         </div>
 
@@ -145,9 +147,9 @@
                         <!-- Step 3: Photo Capture -->
                         <div class="step-content" id="step-content-3">
                             <div class="form-section-title">Tu Fotografía</div>
-                            <p class="help-text">Tómate una foto de tu rostro (tipo carnet). Por favor, busca un lugar con buena luz y un fondo claro.</p>
+                            <p class="help-text">Tómate una foto de tu rostro (tipo carnet). Por favor, busca un lugar con buena luz y un fondo claro. Mantén una expresión neutral, sin gafas oscuras ni gorras.</p>
                             
-                            <div class="media-capture-card">
+                            <div class="media-capture-card" id="foto-card">
                                 <div id="foto-preview-box" class="media-placeholder big">
                                     <span class="media-icon">📸</span>
                                     <p>Presiona el botón para capturar tu foto</p>
@@ -155,7 +157,7 @@
                                 <div class="badge-status">
                                     <span id="badge-foto" class="badge pending">Sin capturar</span>
                                 </div>
-                                <div class="media-actions-main">
+                                <div class="media-actions-main" style="display: flex; gap: 10px; justify-content: center;">
                                     <button type="button" class="btn btn-primary" id="btn-capture-foto-wizard">
                                         📷 Abrir Cámara
                                     </button>
@@ -164,7 +166,9 @@
                             </div>
 
                             <div style="text-align: center; margin-top: 15px; font-size: 0.85rem;">
-                                ¿No puedes usar la cámara? <a href="#" class="btn-toggle-fallback" style="color: var(--primary-color);">Subir foto de galería</a>
+                                ¿No puedes usar la cámara? 
+                                <label for="foto_input" style="display: inline; color: var(--primary-color); cursor: pointer; text-decoration: underline; font-weight: normal;">Subir foto de galería</label>
+                                <input type="file" id="foto_input" accept="image/png, image/jpeg" style="display: none;">
                             </div>
 
                             <div class="form-actions">
@@ -176,9 +180,9 @@
                         <!-- Step 4: Document Capture -->
                         <div class="step-content" id="step-content-4">
                             <div class="form-section-title">Documento de Identidad</div>
-                            <p class="help-text">Por favor, tómale una foto a tu documento de identidad original por ambos lados. Asegúrate de que se vea claro y que las letras se puedan leer.</p>
+                            <p class="help-text">Tómale una foto a tu documento de identidad por ambos lados. Asegúrate de acercar bien la cámara para capturar los bordes del documento, que haya buena iluminación y que sea legible.</p>
                             
-                            <div class="docs-grid">
+                            <div class="docs-grid" id="docs-camera-section">
                                 <!-- Cara Frontal -->
                                 <div class="media-capture-card small">
                                     <span class="media-label">Cara Frontal (Donde está tu foto)</span>
@@ -188,7 +192,10 @@
                                     <div class="badge-status">
                                         <span id="badge-doc-front" class="badge pending">Pendiente</span>
                                     </div>
-                                    <button type="button" class="btn-sm btn-primary" id="btn-capture-doc-front-wizard">Capturar</button>
+                                    <div style="display: flex; gap: 5px; justify-content: center;">
+                                        <button type="button" class="btn-sm btn-primary" id="btn-capture-doc-front-wizard">Capturar</button>
+                                        <button type="button" class="btn-sm btn-secondary" id="btn-delete-doc-front-wizard" style="display: none;">🗑️</button>
+                                    </div>
                                 </div>
                                 
                                 <!-- Cara Reverso -->
@@ -200,37 +207,29 @@
                                     <div class="badge-status">
                                         <span id="badge-doc-back" class="badge pending">Pendiente</span>
                                     </div>
-                                    <button type="button" class="btn-sm btn-primary" id="btn-capture-doc-back-wizard">Capturar</button>
+                                    <div style="display: flex; gap: 5px; justify-content: center;">
+                                        <button type="button" class="btn-sm btn-primary" id="btn-capture-doc-back-wizard">Capturar</button>
+                                        <button type="button" class="btn-sm btn-secondary" id="btn-delete-doc-back-wizard" style="display: none;">🗑️</button>
+                                    </div>
                                 </div>
                             </div>
+                            
+                            <div id="doc-pdf-success-section" class="media-capture-card" style="display: none; border-color: var(--success-color); background: rgba(16, 185, 129, 0.05);">
+                                <span class="media-icon" style="font-size: 3rem; display: block; margin-bottom: 10px;">📄</span>
+                                <h3 style="color: var(--success-color);">Archivo PDF cargado correctamente</h3>
+                                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;" id="doc-pdf-filename"></p>
+                                <button type="button" class="btn-sm btn-secondary" id="btn-remove-pdf">Quitar PDF y usar cámara</button>
+                            </div>
 
-                            <div style="text-align: center; margin-top: 15px; font-size: 0.85rem;">
-                                ¿Problemas con la cámara? <a href="#" class="btn-toggle-fallback" style="color: var(--primary-color);">Subir desde galería</a>
+                            <div style="text-align: center; margin-top: 15px; font-size: 0.85rem;" id="doc-pdf-upload-hint">
+                                ¿No tienes el documento físico a la mano? 
+                                <label for="doc_pdf_input" style="display: inline; color: var(--primary-color); cursor: pointer; text-decoration: underline; font-weight: normal;">Subir documento desde archivos (PDF)</label>
+                                <input type="file" id="doc_pdf_input" accept="application/pdf" style="display: none;">
                             </div>
 
                             <div class="form-actions">
                                 <button type="button" class="btn btn-secondary btn-prev-step">Atrás</button>
                                 <button type="submit" class="btn btn-primary" id="btn-submit">Finalizar Registro</button>
-                            </div>
-                        </div>
-
-                        <!-- Fallback upload (hidden by default) -->
-                        <div id="fallback-section" class="hidden">
-                            <div class="form-section">
-                                <h3>Subir fotos desde tu galería</h3>
-                                <p class="help-text">Si tienes problemas con la cámara, puedes subir las fotos que ya tengas guardadas en tu celular o computador.</p>
-                                <div class="fallback-inputs-grid">
-                                    <input type="file" id="foto_input" accept="image/png, image/jpeg" style="display: none;">
-                                    <input type="file" id="doc_front_input" accept="image/png, image/jpeg" style="display: none;">
-                                    <input type="file" id="doc_back_input" accept="image/png, image/jpeg" style="display: none;">
-                                    
-                                    <button type="button" class="btn-sm btn-secondary" onclick="document.getElementById('foto_input').click();">Subir foto de rostro</button>
-                                    <button type="button" class="btn-sm btn-secondary" onclick="document.getElementById('doc_front_input').click();">Subir frontal del documento</button>
-                                    <button type="button" class="btn-sm btn-secondary" onclick="document.getElementById('doc_back_input').click();">Subir reverso del documento</button>
-                                </div>
-                                <div style="text-align: center; margin-top: 15px;">
-                                    <button type="button" class="btn-sm btn-primary btn-close-fallback">Ocultar opciones de galería</button>
-                                </div>
                             </div>
                         </div>
                     </form>
@@ -364,6 +363,7 @@
                 <div class="camera-aspect-ratio">
                     <video id="camera-video" autoplay playsinline></video>
                     
+                    <!-- Stencil for photo (oval) -->
                     <svg id="camera-stencil" viewBox="0 0 300 400" preserveAspectRatio="xMidYMid slice">
                         <defs>
                             <mask id="stencil-mask">
@@ -374,6 +374,20 @@
                         <rect width="100%" height="100%" fill="rgba(0,0,0,0.6)" mask="url(#stencil-mask)" />
                         <path id="stencil-border" d="" fill="none" stroke="#10b981" stroke-width="3" stroke-dasharray="10 5" />
                     </svg>
+
+                    <!-- Document guide overlay (shown only for doc steps) -->
+                    <div id="doc-camera-guide" class="doc-camera-guide hidden">
+                        <div class="doc-guide-frame">
+                            <div class="doc-corner top-left"></div>
+                            <div class="doc-corner top-right"></div>
+                            <div class="doc-corner bottom-left"></div>
+                            <div class="doc-corner bottom-right"></div>
+                            <span class="doc-guide-label" id="doc-guide-label">Centra el documento aquí</span>
+                        </div>
+                        <div class="doc-guide-tips">
+                            <span>📏 Acerca la cámara hasta que el documento llene el recuadro</span>
+                        </div>
+                    </div>
                 </div>
             </div>
             

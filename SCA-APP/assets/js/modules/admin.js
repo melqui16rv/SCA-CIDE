@@ -29,7 +29,6 @@ const Admin = {
 
     /**
      * Force-download a file using fetch + blob URL.
-     * Works for same-origin files where the browser would normally open them inline.
      */
     async downloadFile(url, filename) {
         try {
@@ -47,6 +46,51 @@ const Admin = {
         } catch (err) {
             alert('No se pudo descargar el archivo. Es posible que aún no haya sido cargado.');
         }
+    },
+
+    /**
+     * Open the preview modal for a photo or PDF file.
+     * @param {string} url       - Relative URL of the file
+     * @param {string} filename  - Filename for download
+     * @param {'image'|'pdf'}  type - File type for rendering
+     */
+    showPreview(url, filename, type) {
+        const modal     = document.getElementById('preview-modal');
+        const body      = document.getElementById('preview-modal-body');
+        const title     = document.getElementById('preview-modal-title');
+        const dlBtn     = document.getElementById('btn-preview-download');
+        const closeBtn  = document.getElementById('btn-preview-cancel');
+        const closeBtn2 = document.getElementById('btn-preview-close');
+
+        title.textContent = type === 'image' ? 'Foto del aprendiz' : 'Documento de identidad (PDF)';
+
+        if (type === 'image') {
+            body.innerHTML = `
+                <div class="preview-img-wrap">
+                    <img src="${url}?t=${Date.now()}" alt="Foto del aprendiz" class="preview-img">
+                </div>`;
+        } else {
+            body.innerHTML = `
+                <div class="preview-pdf-wrap">
+                    <iframe src="${url}" class="preview-pdf" title="Documento PDF"></iframe>
+                </div>`;
+        }
+
+        modal.classList.remove('hidden');
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+
+        // Download handler
+        const newDlBtn = dlBtn.cloneNode(true);
+        dlBtn.parentNode.replaceChild(newDlBtn, dlBtn);
+        newDlBtn.onclick = () => this.downloadFile(url, filename);
+
+        // Close handlers
+        const close = () => {
+            modal.classList.add('hidden');
+            body.innerHTML = ''; // Free iframe/img resources
+        };
+        closeBtn.onclick  = close;
+        closeBtn2.onclick = close;
     },
 
     render() {
@@ -119,14 +163,14 @@ const Admin = {
                 <td>
                     <div style="display:flex; gap:6px; flex-wrap:wrap;">
                         ${fotoUrl
-                            ? `<button class="btn-sm btn-secondary dl-btn" data-url="${fotoUrl}" data-filename="foto_${doc}.jpg" title="Descargar Foto" style="gap:4px;">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            ? `<button class="btn-sm btn-secondary dl-btn" data-url="${fotoUrl}" data-filename="foto_${doc}.jpg" data-type="image" title="Ver y descargar Foto" style="gap:4px;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                                 Foto
                                </button>`
                             : '<span style="color:var(--text-muted); font-size:0.8rem;">Sin foto</span>'}
                         ${pdfUrl
-                            ? `<button class="btn-sm btn-secondary dl-btn" data-url="${pdfUrl}" data-filename="documento_${doc}.pdf" title="Descargar PDF" style="gap:4px;">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            ? `<button class="btn-sm btn-secondary dl-btn" data-url="${pdfUrl}" data-filename="documento_${doc}.pdf" data-type="pdf" title="Ver y descargar PDF" style="gap:4px;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
                                 PDF
                                </button>`
                             : '<span style="color:var(--text-muted); font-size:0.8rem;">Sin doc.</span>'}
@@ -152,13 +196,15 @@ const Admin = {
 
     /**
      * Bind click handlers on all download buttons in the table.
+     * Now opens preview modal first; download is inside the modal.
      */
     bindDownloadButtons() {
         document.querySelectorAll('.dl-btn').forEach(btn => {
             btn.onclick = () => {
-                const url = btn.dataset.url;
+                const url      = btn.dataset.url;
                 const filename = btn.dataset.filename;
-                this.downloadFile(url, filename);
+                const type     = btn.dataset.type; // 'image' or 'pdf'
+                this.showPreview(url, filename, type);
             };
         });
     },

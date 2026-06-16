@@ -223,40 +223,105 @@ document.addEventListener('DOMContentLoaded', () => {
         UI.showLoading('Generando documento y guardando registro...');
 
         try {
-            let finalPdfBlob = AppState.docPdfBlob;
+        let finalPdfBlob = AppState.docPdfBlob;
+
+            // ── Helper: compress a base64 image to a target size range ────
+            const compressBase64Image = (base64DataUrl, minKB, maxKB) => {
+                return new Promise((resolve) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        // Keep doc images at reasonable resolution
+                        const MAX_W = 1200;
+                        const scale = Math.min(1, MAX_W / img.naturalWidth);
+                        canvas.width  = Math.round(img.naturalWidth  * scale);
+                        canvas.height = Math.round(img.naturalHeight * scale);
+                        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                        // Binary bisection quality search
+                        let lo = 0.55, hi = 0.97, attempts = 0;
+                        const tryQ = (q) => {
+                            canvas.toBlob((blob) => {
+                                attempts++;
+                                const sizeKB = blob.size / 1024;
+                                if ((sizeKB >= minKB && sizeKB <= maxKB) || attempts >= 12) {
+                                    resolve(canvas.toDataURL('image/jpeg', q));
+                                } else if (sizeKB > maxKB) {
+                                    hi = q; tryQ((lo + hi) / 2);
+                                } else {
+                                    lo = q; tryQ((lo + hi) / 2);
+                                }
+                            }, 'image/jpeg', q);
+                        };
+                        tryQ(0.85);
+                    };
+                    img.src = base64DataUrl;
+                });
+            };
 
             // Generate PDF Client-Side if images were captured
             if (!finalPdfBlob) {
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
-                
-                const imgFront = await Utils.loadImage(AppState.docFrontBase64);
-                const imgBack = await Utils.loadImage(AppState.docBackBase64);
+
+                // Compress each document image before embedding: target 200–450 KB each
+                UI.showLoading('Optimizando imágenes del documento…');
+                const compressedFront = await compressBase64Image(AppState.docFrontBase64, 200, 450);
+                const compressedBack  = await compressBase64Image(AppState.docBackBase64,  200, 450);
+
+                const imgFront = await Utils.loadImage(compressedFront);
+                const imgBack  = await Utils.loadImage(compressedBack);
+
+                UI.showLoading('Generando PDF…');
 
                 pdf.setFontSize(16);
                 pdf.text('SCA-CIDE: Registro de Documento', 105, 20, { align: 'center' });
-                
+
                 pdf.setFontSize(10);
                 pdf.setTextColor(100);
                 pdf.text(`Aprendiz: ${document.getElementById('nombre_completo').value}`, 20, 30);
                 pdf.text(`Documento: ${AppState.currentDocumento}`, 20, 35);
-                
-                const addImgToPdf = (img, y, title) => {
+
+                const addImgToPdf = (img, dataUrl, y, title) => {
                     pdf.setTextColor(0);
                     pdf.setFont('helvetica', 'bold');
                     pdf.text(title, 20, y);
                     const ratio = img.naturalWidth / img.naturalHeight;
                     const w = 170;
                     const h = w / ratio;
-                    pdf.addImage(img.src, 'JPEG', 20, y + 5, w, h, undefined, 'FAST');
+                    // 'MEDIUM' compression keeps quality while reducing PDF size
+                    pdf.addImage(dataUrl, 'JPEG', 20, y + 5, w, h, undefined, 'MEDIUM');
                     return h + 15;
                 };
 
                 let currentY = 45;
-                currentY += addImgToPdf(imgFront, currentY, 'Cara Frontal');
-                addImgToPdf(imgBack, currentY, 'Cara Reverso');
+                currentY += addImgToPdf(imgFront, compressedFront, currentY, 'Cara Frontal');
+                addImgToPdf(imgBack, compressedBack, currentY, 'Cara Reverso');
 
                 finalPdfBlob = pdf.output('blob');
+
+                // Warn if generated PDF is still too heavy (> 2MB)
+                const pdfMB = finalPdfBlob.size / (1024 * 1024);
+                console.info(`[PDF] Generated size: ${pdfMB.toFixed(2)} MB`);
+            } else {
+                // ── Uploaded PDF: check weight ──────────────────────────
+                const uploadedMB = finalPdfBlob.size / (1024 * 1024);
+                console.info(`[PDF] Uploaded size: ${uploadedMB.toFixed(2)} MB`);
+
+                if (uploadedMB > 5) {
+                    // Too heavy: warn the user, but still allow upload
+                    // (client-side PDF re-rendering requires pdf.js which is not loaded)
+                    const proceed = confirm(
+                        `El archivo PDF que subiste pesa ${uploadedMB.toFixed(1)} MB, lo cual puede generar problemas al guardarlo en el servidor.\n\n` +
+                        'Te recomendamos usar la opción de cámara para capturar ambas caras del documento, ' +
+                        'ya que el sistema las optimizará automáticamente.\n\n' +
+                        '¿Deseas continuar de todas formas?'
+                    );
+                    if (!proceed) {
+                        UI.hideLoading();
+                        return;
+                    }
+                }
             }
 
             // Build FormData

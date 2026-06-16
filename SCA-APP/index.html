@@ -36,10 +36,10 @@
             <div class="card card-sm">
                 <div class="card-header">
                     <div class="brand-logo">
-                        <i data-lucide="shield-check"></i>
+                        <i data-lucide="id-card"></i>
                     </div>
-                    <h2>Bienvenido a SCA-CIDE</h2>
-                    <p>Ingresa tu número de documento para comenzar</p>
+                    <h2>Carnet Institucional SENA</h2>
+                    <p>Ingresa tu número de documento para completar los datos necesarios para la elaboración de tu carnet institucional.</p>
                 </div>
                 <div class="card-body">
                     <form id="form-view1">
@@ -68,7 +68,7 @@
         <div id="view2" class="view hidden view-stepper">
             <div class="card">
                 <div class="card-header">
-                    <h2>Completa tu Registro</h2>
+                    <h2>Elaboración del Carnet Institucional</h2>
                     <!-- Stepper Indicator -->
                     <div class="stepper-indicator">
                         <div class="step active" data-step="1">1</div>
@@ -142,7 +142,7 @@
                                 <i data-lucide="file-text" class="step-intro-icon"></i>
                                 <div>
                                     <h3 class="step-intro-title">Información de Expedición</h3>
-                                    <p class="step-intro-sub">Revisa la parte trasera de tu cédula para ver la fecha y lugar.</p>
+                                    <p class="step-intro-sub">Revisa la parte trasera de tu cédula o documento de identificación para encontrar la <strong>fecha</strong> y el <strong>lugar de expedición</strong>.</p>
                                 </div>
                             </div>
 
@@ -205,8 +205,8 @@
                             <div class="step-intro">
                                 <i data-lucide="camera" class="step-intro-icon"></i>
                                 <div>
-                                    <h3 class="step-intro-title">Tu Fotografía</h3>
-                                    <p class="step-intro-sub">Fondo claro, buena luz, expresión neutral. Sin gafas oscuras ni gorras.</p>
+                                    <h3 class="step-intro-title">Tu Fotografía para el Carnet</h3>
+                                    <p class="step-intro-sub">Esta foto aparecerá en tu carnet institucional. Usa fondo claro, buena iluminación y expresión neutral. Sin gafas oscuras, gorras ni accesorios que cubran tu rostro.</p>
                                 </div>
                             </div>
 
@@ -254,7 +254,7 @@
                                 <i data-lucide="credit-card" class="step-intro-icon"></i>
                                 <div>
                                     <h3 class="step-intro-title">Documento de Identidad</h3>
-                                    <p class="step-intro-sub">Fotografía ambos lados. Acerca la cámara para que el documento llene el encuadre.</p>
+                                    <p class="step-intro-sub">Necesitamos una fotografía de ambas caras de tu documento para verificar tu identidad. Acerca la cámara para que el documento ocupe todo el encuadre y el texto sea legible.</p>
                                 </div>
                             </div>
 
@@ -543,6 +543,31 @@
                 </button>
                 <button type="button" class="btn-shutter" id="btn-camera-capture" title="Capturar">
                     <span class="shutter-inner"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════
+         Modal: Previsualización de archivos (Admin)
+    ══════════════════════════════════════════════════ -->
+    <div id="preview-modal" class="modal hidden">
+        <div class="modal-content preview-modal-content">
+            <div class="preview-modal-header">
+                <h3 id="preview-modal-title">Vista previa</h3>
+                <button type="button" class="btn-icon btn-ghost" id="btn-preview-close" title="Cerrar">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div id="preview-modal-body" class="preview-modal-body">
+                <!-- Populated by admin.js -->
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" id="btn-preview-cancel">
+                    <i data-lucide="x"></i> Cerrar
+                </button>
+                <button type="button" class="btn btn-primary" id="btn-preview-download">
+                    <i data-lucide="download"></i> Descargar
                 </button>
             </div>
         </div>

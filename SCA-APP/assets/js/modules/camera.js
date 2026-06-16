@@ -51,13 +51,11 @@ const Camera = {
         hint.textContent  = cfg.hint;
 
         if (cfg.isDoc) {
-            // Document mode: show guide overlay with animated corners, hide oval stencil
             stencilSvg.style.display = 'none';
             docGuide.classList.remove('hidden');
             if (docLabel) docLabel.textContent = cfg.guideLabel;
             aspectBox.classList.add('doc-mode');
         } else {
-            // Photo mode: show oval stencil, hide doc guide
             stencilSvg.style.display = '';
             docGuide.classList.add('hidden');
             aspectBox.classList.remove('doc-mode');
@@ -110,6 +108,52 @@ const Camera = {
         return canvas.toDataURL('image/jpeg', 0.9);
     },
 
+    /**
+     * Adaptive JPEG quality via binary bisection.
+     * Iterates until blob size is within [minKB, maxKB] or max attempts reached.
+     *
+     * @param {HTMLCanvasElement} canvas
+     * @param {number} minKB  - Lower bound target (KB)
+     * @param {number} maxKB  - Upper bound target (KB)
+     * @param {string} [mime] - MIME type, defaults to 'image/jpeg'
+     * @returns {Promise<{blob: Blob, dataUrl: string, quality: number, sizeKB: number}>}
+     */
+    compressToTarget(canvas, minKB, maxKB, mime = 'image/jpeg') {
+        return new Promise((resolve) => {
+            let lo = 0.50, hi = 0.97;
+            let attempts = 0;
+            const MAX_ATTEMPTS = 14;
+
+            const tryQuality = (q) => {
+                canvas.toBlob((blob) => {
+                    attempts++;
+                    const sizeKB = blob.size / 1024;
+
+                    const inRange  = sizeKB >= minKB && sizeKB <= maxKB;
+                    const tooManyAttempts = attempts >= MAX_ATTEMPTS;
+
+                    if (inRange || tooManyAttempts) {
+                        const dataUrl = canvas.toDataURL(mime, q);
+                        resolve({ blob, dataUrl, quality: q, sizeKB });
+                        return;
+                    }
+
+                    if (sizeKB > maxKB) {
+                        // Too heavy → lower quality
+                        hi = q;
+                    } else {
+                        // Too light → raise quality
+                        lo = q;
+                    }
+                    tryQuality((lo + hi) / 2);
+                }, mime, q);
+            };
+
+            // Start from a mid-high quality guess
+            tryQuality(0.88);
+        });
+    },
+
     initCropper(imageElement, step, onConfirm) {
         if (this.state.cropper) this.state.cropper.destroy();
 
@@ -120,41 +164,45 @@ const Camera = {
         const cropperHint = document.getElementById('cropper-hint');
         if (cropperHint) {
             cropperHint.textContent = isDoc
-                ? 'Asegúrate de que los cuatro bordes del documento sean visibles. El recuadro ya tiene la proporción correcta.'
+                ? 'Mueve o redimensiona el recuadro azul para encuadrar bien el documento. El recuadro mantiene la proporción correcta.'
                 : 'Ajusta el recuadro para que tu rostro quede centrado.';
         }
 
         this.state.cropper = new Cropper(imageElement, {
             aspectRatio: ratio,
-            viewMode: 2,               // crop box cannot exceed canvas
+            viewMode: 1,              // crop box stays within canvas
             guides: true,
             center: true,
             highlight: true,
-            autoCropArea: isDoc ? 0.97 : 0.85,
-            // For documents: lock the crop box so the user cannot shrink it —
-            // they MUST fill the frame by moving physically closer with the phone.
-            movable: !isDoc,
+            autoCropArea: isDoc ? 0.95 : 0.85,
+            movable: true,
             zoomable: !isDoc,
-            cropBoxMovable: !isDoc,
-            cropBoxResizable: !isDoc
+            cropBoxMovable: true,
+            cropBoxResizable: true
         });
 
         const oldBtn = document.getElementById('btn-crop-confirm');
         const confirmBtn = oldBtn.cloneNode(true);
         oldBtn.parentNode.replaceChild(confirmBtn, oldBtn);
 
-        confirmBtn.onclick = () => {
-            // Higher output resolution for documents to keep text legible
-            const cropW = isDoc ? 1000 : 450;
-            const cropH = isDoc ?  630 : 600;
+        confirmBtn.onclick = async () => {
+            confirmBtn.disabled = true;
+            confirmBtn.textContent = 'Procesando…';
+
+            // ── Output resolution ──────────────────────────────────────────
+            // Foto carnet : 700 × 933 px  (3:4 ratio)  → target 200–500 KB
+            // Documento   : 1200 × 756 px (1.586:1)    → target 350–900 KB
+            const cropW = isDoc ? 1200 : 700;
+            const cropH = isDoc ?  756 : 933;
 
             const canvas = this.state.cropper.getCroppedCanvas({
-                width: cropW,
+                width:  cropW,
                 height: cropH,
+                imageSmoothingEnabled: true,
                 imageSmoothingQuality: 'high'
             });
 
-            // Pixel-level brightness check
+            // ── Brightness guard ───────────────────────────────────────────
             const ctx = canvas.getContext('2d');
             const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             let colorSum = 0;
@@ -162,17 +210,34 @@ const Camera = {
                 colorSum += (imgData.data[i] + imgData.data[i + 1] + imgData.data[i + 2]) / 3;
             }
             const brightness = colorSum / (canvas.width * canvas.height);
+
             if (brightness < 60) {
+                confirmBtn.disabled = false;
+                confirmBtn.textContent = 'Confirmar';
                 if (!confirm('⚠️ La imagen parece estar muy oscura. Te recomendamos repetirla en un lugar más iluminado. ¿Deseas continuar con esta imagen?')) {
                     return;
                 }
+                confirmBtn.disabled = true;
+                confirmBtn.textContent = 'Procesando…';
             }
 
-            canvas.toBlob((blob) => {
-                onConfirm(blob, canvas.toDataURL('image/jpeg', 0.85));
-                this.state.cropper.destroy();
-                document.getElementById('cropper-modal').classList.add('hidden');
-            }, 'image/jpeg', 0.85);
+            // ── Adaptive compression ───────────────────────────────────────
+            const minKB = isDoc ? 350 : 200;
+            const maxKB = isDoc ? 900 : 500;
+
+            const { blob, dataUrl, quality, sizeKB } = await this.compressToTarget(canvas, minKB, maxKB);
+
+            console.info(
+                `[Camera] ${isDoc ? 'Documento' : 'Foto'} → ` +
+                `${cropW}×${cropH}px | quality ${quality.toFixed(3)} | ${sizeKB.toFixed(1)} KB`
+            );
+
+            onConfirm(blob, dataUrl);
+            this.state.cropper.destroy();
+            document.getElementById('cropper-modal').classList.add('hidden');
+
+            confirmBtn.disabled = false;
+            confirmBtn.textContent = 'Confirmar';
         };
     }
 };

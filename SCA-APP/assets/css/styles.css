@@ -845,6 +845,67 @@ input:focus, select:focus {
 }
 .modal-actions .btn { flex: 1; }
 
+/* ── Admin Preview Modal ─────────────────────────────────── */
+.preview-modal-content {
+    max-width: 720px;
+    text-align: left;
+    padding: 24px;
+}
+.preview-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    gap: 12px;
+}
+.preview-modal-header h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-main);
+}
+.preview-modal-body {
+    width: 100%;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background: var(--bg-input);
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.preview-img-wrap {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f0f0f0;
+}
+.preview-img {
+    max-width: 100%;
+    max-height: 60vh;
+    object-fit: contain;
+    border-radius: var(--radius-sm);
+    display: block;
+}
+.preview-pdf-wrap {
+    width: 100%;
+    height: 60vh;
+}
+.preview-pdf {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+}
+.preview-modal-content .modal-actions {
+    justify-content: flex-end;
+}
+.preview-modal-content .modal-actions .btn {
+    flex: 0 0 auto;
+    min-width: 130px;
+}
+
 .help-text {
     font-size: 0.85rem;
     color: var(--text-sub);

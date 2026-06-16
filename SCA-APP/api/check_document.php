@@ -51,7 +51,7 @@ try {
     } else {
         echo json_encode([
             'success' => false, 
-            'message' => 'No encontramos un aprendiz con ese número. Por favor, verifica los datos o solicita ayuda en tu centro.'
+            'message' => 'No encontramos un registro con ese número. Por favor, verifica los datos o solicita ayuda en tu centro.'
         ]);
     }
 

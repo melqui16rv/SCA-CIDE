@@ -509,18 +509,6 @@
                 <div class="camera-aspect-ratio">
                     <video id="camera-video" autoplay playsinline></video>
 
-                    <!-- Stencil oval (foto carnet) -->
-                    <svg id="camera-stencil" viewBox="0 0 300 400" preserveAspectRatio="xMidYMid slice">
-                        <defs>
-                            <mask id="stencil-mask">
-                                <rect width="100%" height="100%" fill="white"/>
-                                <path id="stencil-path" d="" fill="black"/>
-                            </mask>
-                        </defs>
-                        <rect width="100%" height="100%" fill="rgba(0,0,0,0.6)" mask="url(#stencil-mask)"/>
-                        <path id="stencil-border" d="" fill="none" stroke="#10b981" stroke-width="3" stroke-dasharray="10 5"/>
-                    </svg>
-
                     <!-- Guía de documento (cara frontal / reverso) -->
                     <div id="doc-camera-guide" class="doc-camera-guide hidden">
                         <div class="doc-guide-frame">

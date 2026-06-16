@@ -12,8 +12,7 @@ const Camera = {
     configs: {
         'foto': {
             title: 'Foto estilo carnet',
-            hint: '⚠️ Usa un FONDO BLANCO o claro. Centra tu rostro en la silueta.',
-            stencil: "M150,75 C191,75 225,122 225,180 C225,238 191,285 150,285 C109,285 75,238 75,180 C75,122 109,75 150,75 Z",
+            hint: '⚠️ Usa un FONDO BLANCO o claro y encuadra tu rostro de frente.',
             facing: 'user',
             isDoc: false
         },
@@ -42,7 +41,6 @@ const Camera = {
         const video      = document.getElementById('camera-video');
         const title      = document.getElementById('camera-title');
         const hint       = document.getElementById('camera-instructions');
-        const stencilSvg = document.getElementById('camera-stencil');
         const docGuide   = document.getElementById('doc-camera-guide');
         const docLabel   = document.getElementById('doc-guide-label');
         const aspectBox  = document.querySelector('.camera-aspect-ratio');
@@ -51,18 +49,12 @@ const Camera = {
         hint.textContent  = cfg.hint;
 
         if (cfg.isDoc) {
-            stencilSvg.style.display = 'none';
             docGuide.classList.remove('hidden');
             if (docLabel) docLabel.textContent = cfg.guideLabel;
             aspectBox.classList.add('doc-mode');
         } else {
-            stencilSvg.style.display = '';
             docGuide.classList.add('hidden');
             aspectBox.classList.remove('doc-mode');
-            const stencilPath   = document.getElementById('stencil-path');
-            const stencilBorder = document.getElementById('stencil-border');
-            stencilPath.setAttribute('d', cfg.stencil);
-            stencilBorder.setAttribute('d', cfg.stencil);
         }
 
         modal.classList.remove('hidden');
@@ -101,7 +93,6 @@ const Camera = {
         document.getElementById('camera-modal').classList.add('hidden');
 
         // Reset modal UI state for next time
-        document.getElementById('camera-stencil').style.display = '';
         document.getElementById('doc-camera-guide').classList.add('hidden');
         document.querySelector('.camera-aspect-ratio').classList.remove('doc-mode');
 

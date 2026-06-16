@@ -12,8 +12,8 @@ const Camera = {
     configs: {
         'foto': {
             title: 'Foto estilo carnet',
-            hint: 'Centra tu rostro dentro del óvalo. Mantén una expresión neutral.',
-            stencil: "M150,55 C215,55 255,120 255,200 C255,305 205,355 150,355 C95,355 45,305 45,200 C45,120 85,55 150,55 Z",
+            hint: '⚠️ Usa un FONDO BLANCO o claro. Centra tu rostro en la silueta.',
+            stencil: "M150,75 C191,75 225,122 225,180 C225,238 191,285 150,285 C109,285 75,238 75,180 C75,122 109,75 150,75 Z",
             facing: 'user',
             isDoc: false
         },
@@ -165,7 +165,7 @@ const Camera = {
         if (cropperHint) {
             cropperHint.textContent = isDoc
                 ? 'Mueve o redimensiona el recuadro azul para encuadrar bien el documento. El recuadro mantiene la proporción correcta.'
-                : 'Ajusta el recuadro para que tu rostro quede centrado.';
+                : 'Ajusta el recuadro para que tu rostro y hombros queden bien centrados.';
         }
 
         this.state.cropper = new Cropper(imageElement, {
@@ -190,10 +190,10 @@ const Camera = {
             confirmBtn.textContent = 'Procesando…';
 
             // ── Output resolution ──────────────────────────────────────────
-            // Foto carnet : 700 × 933 px  (3:4 ratio)  → target 200–500 KB
-            // Documento   : 1200 × 756 px (1.586:1)    → target 350–900 KB
-            const cropW = isDoc ? 1200 : 700;
-            const cropH = isDoc ?  756 : 933;
+            // Foto carnet : 800 × 1066 px  (3:4 ratio)
+            // Documento   : 1400 × 882 px (1.586:1)
+            const cropW = isDoc ? 1400 : 800;
+            const cropH = isDoc ?  882 : 1066;
 
             const canvas = this.state.cropper.getCroppedCanvas({
                 width:  cropW,
@@ -222,7 +222,7 @@ const Camera = {
             }
 
             // ── Adaptive compression ───────────────────────────────────────
-            const minKB = isDoc ? 350 : 200;
+            const minKB = isDoc ? 400 : 250;
             const maxKB = isDoc ? 900 : 500;
 
             const { blob, dataUrl, quality, sizeKB } = await this.compressToTarget(canvas, minKB, maxKB);

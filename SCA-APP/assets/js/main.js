@@ -232,11 +232,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
                         // Keep doc images at reasonable resolution
-                        const MAX_W = 1200;
+                        const MAX_W = 1600;
                         const scale = Math.min(1, MAX_W / img.naturalWidth);
                         canvas.width  = Math.round(img.naturalWidth  * scale);
                         canvas.height = Math.round(img.naturalHeight * scale);
-                        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                        
+                        const ctx = canvas.getContext('2d');
+                        // Apply scan-like filter to enhance text legibility
+                        ctx.filter = 'contrast(1.15) brightness(1.05)';
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
                         // Binary bisection quality search
                         let lo = 0.55, hi = 0.97, attempts = 0;
@@ -264,10 +268,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
 
-                // Compress each document image before embedding: target 200–450 KB each
+                // Compress each document image before embedding: target 250–550 KB each
                 UI.showLoading('Optimizando imágenes del documento…');
-                const compressedFront = await compressBase64Image(AppState.docFrontBase64, 200, 450);
-                const compressedBack  = await compressBase64Image(AppState.docBackBase64,  200, 450);
+                const compressedFront = await compressBase64Image(AppState.docFrontBase64, 250, 550);
+                const compressedBack  = await compressBase64Image(AppState.docBackBase64,  250, 550);
 
                 const imgFront = await Utils.loadImage(compressedFront);
                 const imgBack  = await Utils.loadImage(compressedBack);

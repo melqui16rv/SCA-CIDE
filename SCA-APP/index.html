@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SCA-CIDE - Registro de Aprendices</title>
     <meta name="description" content="Formulario de registro fotográfico y documental para aprendices del SENA CIDE.">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,7 +25,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <!-- Styles -->
-    <link href="assets/css/styles.css" rel="stylesheet">
+    <link href="assets/css/styles.css?v=1.1" rel="stylesheet">
     <link rel="shortcut icon" href="favicon.svg" type="image/x-icon">
 </head>
 <body>
@@ -229,6 +232,11 @@
                                         </button>
                                     </div>
                                 </div>
+                            </div>
+                            
+                            <div class="camera-warning-text" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 12px; text-align: center; padding: 0 10px;">
+                                <i data-lucide="info" style="width: 14px; height: 14px; vertical-align: middle; margin-top: -2px;"></i> 
+                                Si la cámara no se activa o no abre, por favor intenta usar otro navegador (como Chrome o Safari).
                             </div>
 
                             <div class="alt-upload-link">
@@ -589,7 +597,7 @@
     </div>
 
     <!-- Scripts -->
-    <script type="module" src="assets/js/main.js"></script>
+    <script type="module" src="assets/js/main.js?v=1.1"></script>
     <script>
         // Initialize Lucide icons after DOM is ready
         document.addEventListener('DOMContentLoaded', () => lucide.createIcons());

@@ -1031,6 +1031,22 @@ tr:hover td { background: var(--bg-input); }
 /* ── Utilities ───────────────────────────────────────────── */
 .hidden { display: none !important; }
 
+/* ── Autocomplete ────────────────────────────────────────── */
+.autocomplete-items div {
+    padding: 10px 16px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: var(--text-main);
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s ease;
+}
+.autocomplete-items div:last-child {
+    border-bottom: none;
+}
+.autocomplete-items div:hover {
+    background-color: var(--bg-input);
+}
+
 /* ── Animations ──────────────────────────────────────────── */
 @keyframes fadeIn {
     from { opacity: 0; }

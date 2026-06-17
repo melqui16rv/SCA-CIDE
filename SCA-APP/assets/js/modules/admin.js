@@ -18,6 +18,7 @@ const Admin = {
 
         if (result.success) {
             this.state.users = result.data;
+            this.initAutocomplete();
             this.render();
             this.bindEvents();
             UI.showView('admin-dashboard');
@@ -25,6 +26,58 @@ const Admin = {
             alert(result.message);
             UI.showView('view1');
         }
+    },
+
+    initAutocomplete() {
+        const input = document.getElementById('admin-ficha-filter');
+        const list = document.getElementById('ficha-autocomplete-list');
+        if (!input || !list) return;
+
+        const uniqueFichas = [...new Set(this.state.users
+            .map(u => u.ficha_aprendiz)
+            .filter(f => f != null && f.trim() !== ''))]
+            .sort((a, b) => a.localeCompare(b));
+
+        input.addEventListener('input', () => {
+            const val = input.value.trim().toLowerCase();
+            list.innerHTML = '';
+            if (!val) {
+                list.classList.add('hidden');
+                this.state.currentPage = 1; 
+                this.render();
+                return;
+            }
+
+            const matches = uniqueFichas.filter(f => f.toLowerCase().includes(val));
+            if (matches.length > 0) {
+                matches.forEach(m => {
+                    const div = document.createElement('div');
+                    div.textContent = m;
+                    div.addEventListener('click', () => {
+                        input.value = m;
+                        list.classList.add('hidden');
+                        this.state.currentPage = 1;
+                        this.render();
+                    });
+                    list.appendChild(div);
+                });
+                list.classList.remove('hidden');
+            } else {
+                list.classList.add('hidden');
+            }
+            
+            this.state.currentPage = 1;
+            this.render();
+        });
+
+        // Hide autocomplete when clicking outside
+        document.addEventListener('click', (e) => {
+            if (e.target !== input && e.target !== list) {
+                list.classList.add('hidden');
+            }
+        });
+    },
+
     /**
      * Force-download a file using fetch + blob URL.
      */

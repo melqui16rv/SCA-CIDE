@@ -18,7 +18,6 @@ const Admin = {
 
         if (result.success) {
             this.state.users = result.data;
-            this.populateFichas();
             this.render();
             this.bindEvents();
             UI.showView('admin-dashboard');
@@ -26,26 +25,6 @@ const Admin = {
             alert(result.message);
             UI.showView('view1');
         }
-    },
-
-    populateFichas() {
-        const datalist = document.getElementById('fichas-list');
-        if (!datalist) return;
-        
-        // Extract unique fichas
-        const fichas = [...new Set(this.state.users
-            .map(u => u.ficha_aprendiz)
-            .filter(f => f != null && f.trim() !== ''))]
-            .sort((a, b) => a.localeCompare(b));
-
-        datalist.innerHTML = '';
-        fichas.forEach(f => {
-            const opt = document.createElement('option');
-            opt.value = f;
-            datalist.appendChild(opt);
-        });
-    },
-
     /**
      * Force-download a file using fetch + blob URL.
      */
@@ -139,7 +118,10 @@ const Admin = {
 
             if (filterRole !== 'todos' && u.rol !== filterRole) return false;
             
-            if (filterFicha !== '' && u.ficha_aprendiz !== filterFicha) return false;
+            if (filterFicha !== '') {
+                const fStr = (u.ficha_aprendiz || '').toLowerCase();
+                if (!fStr.includes(filterFicha.toLowerCase())) return false;
+            }
 
             if (searchTerm) {
                 const doc = (u.numero_documento_aprendiz || '').toLowerCase();

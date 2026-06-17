@@ -2,7 +2,7 @@
 require_once __DIR__ . '/api/db.php';
 $pdo = getPDOConnection();
 
-$csvFile = __DIR__ . '/../requerimientos/adjuntos/sca-cide_aprendices.csv';
+$csvFile = __DIR__ . '/../requerimientos/adjuntos/LISTADO_FALTANTE_INS_ADM.csv';
 
 if (!file_exists($csvFile)) {
     die("CSV file not found: $csvFile\n");
@@ -33,7 +33,7 @@ if ($handle !== FALSE) {
             if (!mb_check_encoding($nombre, 'UTF-8')) $nombre = mb_convert_encoding($nombre, 'UTF-8', 'ISO-8859-1');
             if (!mb_check_encoding($rol, 'UTF-8')) $rol = mb_convert_encoding($rol, 'UTF-8', 'ISO-8859-1');
             
-            if (empty($id) || $id === 'ID') continue;
+            if (empty($id) || $id === 'ID' || $id === 'NUMERO DOCUMENTO') continue;
             
             $values = array_merge($values, [$id, $nombre, $correo, $telefono, $rol]);
             $placeholders[] = "(?, ?, ?, ?, ?)";

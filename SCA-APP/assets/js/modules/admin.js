@@ -18,6 +18,7 @@ const Admin = {
 
         if (result.success) {
             this.state.users = result.data;
+            this.populateFichas();
             this.render();
             this.bindEvents();
             UI.showView('admin-dashboard');
@@ -25,6 +26,24 @@ const Admin = {
             alert(result.message);
             UI.showView('view1');
         }
+    },
+
+    populateFichas() {
+        const datalist = document.getElementById('fichas-list');
+        if (!datalist) return;
+        
+        // Extract unique fichas
+        const fichas = [...new Set(this.state.users
+            .map(u => u.ficha_aprendiz)
+            .filter(f => f != null && f.trim() !== ''))]
+            .sort((a, b) => a.localeCompare(b));
+
+        datalist.innerHTML = '';
+        fichas.forEach(f => {
+            const opt = document.createElement('option');
+            opt.value = f;
+            datalist.appendChild(opt);
+        });
     },
 
     /**
@@ -98,6 +117,7 @@ const Admin = {
         const searchTerm = document.getElementById('admin-search').value.toLowerCase();
         const filterStatus = document.getElementById('admin-filter').value;
         const filterRole = document.getElementById('admin-role-filter') ? document.getElementById('admin-role-filter').value : 'todos';
+        const filterFicha = document.getElementById('admin-ficha-filter') ? document.getElementById('admin-ficha-filter').value.trim() : '';
         this.state.itemsPerPage = parseInt(document.getElementById('admin-page-size').value) || 10;
 
         let total = 0, validado = 0, pendiente = 0, incompletos = 0;
@@ -118,6 +138,8 @@ const Admin = {
             if (filterStatus === 'incompletos' && (hasFoto && hasDoc)) return false;
 
             if (filterRole !== 'todos' && u.rol !== filterRole) return false;
+            
+            if (filterFicha !== '' && u.ficha_aprendiz !== filterFicha) return false;
 
             if (searchTerm) {
                 const doc = (u.numero_documento_aprendiz || '').toLowerCase();
@@ -237,6 +259,8 @@ const Admin = {
         document.getElementById('admin-filter').onchange = () => { this.state.currentPage = 1; this.render(); };
         const roleFilter = document.getElementById('admin-role-filter');
         if (roleFilter) roleFilter.onchange = () => { this.state.currentPage = 1; this.render(); };
+        const fichaFilter = document.getElementById('admin-ficha-filter');
+        if (fichaFilter) fichaFilter.oninput = () => { this.state.currentPage = 1; this.render(); };
         document.getElementById('admin-page-size').onchange = () => { this.state.currentPage = 1; this.render(); };
 
         document.getElementById('btn-prev-page').onclick = () => {

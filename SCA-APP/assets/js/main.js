@@ -33,6 +33,16 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('nombre_completo').value = data.nombre_completo_aprendiz || '';
         document.getElementById('correo').value = data.correo_electronico_aprendiz || '';
         document.getElementById('telefono').value = data.telefono_aprendiz || '';
+        
+        const aprendizRow = document.getElementById('aprendiz-fields-row');
+        if (data.rol === 'APRENDIZ') {
+            document.getElementById('ficha_aprendiz').value = data.ficha_aprendiz || 'No registrada';
+            document.getElementById('nombre_programa_aprendiz').value = data.nombre_programa_aprendiz || 'No registrado';
+            if(aprendizRow) aprendizRow.style.display = 'flex';
+        } else {
+            if(aprendizRow) aprendizRow.style.display = 'none';
+        }
+
         UI.showView('view2');
         UI.goToStep(1);
         AppState.currentStep = 1;

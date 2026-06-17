@@ -27,7 +27,10 @@ try {
             correo_electronico_aprendiz, 
             telefono_aprendiz,
             ruta_foto_aprendiz,
-            ruta_documento_identificacion_aprendiz
+            ruta_documento_identificacion_aprendiz,
+            rol,
+            ficha_aprendiz,
+            nombre_programa_aprendiz
         FROM sca_cide_aprendices 
         WHERE numero_documento_aprendiz = ?
     ');
@@ -45,7 +48,10 @@ try {
                 'numero_documento_aprendiz'  => $aprendiz['numero_documento_aprendiz'],
                 'nombre_completo_aprendiz'   => $aprendiz['nombre_completo_aprendiz'],
                 'correo_electronico_aprendiz'=> $aprendiz['correo_electronico_aprendiz'],
-                'telefono_aprendiz'          => $aprendiz['telefono_aprendiz']
+                'telefono_aprendiz'          => $aprendiz['telefono_aprendiz'],
+                'rol'                        => $aprendiz['rol'],
+                'ficha_aprendiz'             => $aprendiz['ficha_aprendiz'],
+                'nombre_programa_aprendiz'   => $aprendiz['nombre_programa_aprendiz']
             ]
         ]);
     } else {

@@ -97,6 +97,7 @@ const Admin = {
         const tbody = document.getElementById('users-tbody');
         const searchTerm = document.getElementById('admin-search').value.toLowerCase();
         const filterStatus = document.getElementById('admin-filter').value;
+        const filterRole = document.getElementById('admin-role-filter') ? document.getElementById('admin-role-filter').value : 'todos';
         this.state.itemsPerPage = parseInt(document.getElementById('admin-page-size').value) || 10;
 
         let total = 0, validado = 0, pendiente = 0, incompletos = 0;
@@ -115,6 +116,8 @@ const Admin = {
             if (filterStatus === 'no_validado' && isValid) return false;
             if (filterStatus === 'completos' && (!hasFoto || !hasDoc)) return false;
             if (filterStatus === 'incompletos' && (hasFoto && hasDoc)) return false;
+
+            if (filterRole !== 'todos' && u.rol !== filterRole) return false;
 
             if (searchTerm) {
                 const doc = (u.numero_documento_aprendiz || '').toLowerCase();
@@ -151,6 +154,16 @@ const Admin = {
                 <td>
                     <strong>${u.nombre_completo_aprendiz}</strong><br>
                     <small style="color:var(--text-muted)">CC ${doc}</small>
+                </td>
+                <td>
+                    <div style="font-size:0.85rem; line-height:1.7;">
+                        <span class="badge" style="background:#e2e8f0; color:#475569;">${u.rol || 'N/A'}</span><br>
+                        ${u.rol === 'APRENDIZ' ? 
+                            `<span style="color:var(--text-muted); font-size:0.72rem; text-transform:uppercase; font-weight:700;">Ficha:</span> ${u.ficha_aprendiz || '—'}<br>
+                             <span style="color:var(--text-muted); font-size:0.72rem; text-transform:uppercase; font-weight:700;">Programa:</span> <span style="font-size:0.75rem;">${u.nombre_programa_aprendiz || '—'}</span>` 
+                            : ''
+                        }
+                    </div>
                 </td>
                 <td>
                     <div style="font-size:0.85rem; line-height:1.7;">
@@ -222,6 +235,8 @@ const Admin = {
     bindEvents() {
         document.getElementById('admin-search').oninput = () => { this.state.currentPage = 1; this.render(); };
         document.getElementById('admin-filter').onchange = () => { this.state.currentPage = 1; this.render(); };
+        const roleFilter = document.getElementById('admin-role-filter');
+        if (roleFilter) roleFilter.onchange = () => { this.state.currentPage = 1; this.render(); };
         document.getElementById('admin-page-size').onchange = () => { this.state.currentPage = 1; this.render(); };
 
         document.getElementById('btn-prev-page').onclick = () => {

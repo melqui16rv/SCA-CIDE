@@ -127,6 +127,23 @@
                                     </div>
                                 </div>
                             </div>
+                            
+                            <div class="form-row" id="aprendiz-fields-row" style="display: none;">
+                                <div class="form-group">
+                                    <label>Grupo / Ficha</label>
+                                    <div class="input-with-icon">
+                                        <i data-lucide="users"></i>
+                                        <input type="text" id="ficha_aprendiz" readonly class="input-readonly">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Programa</label>
+                                    <div class="input-with-icon">
+                                        <i data-lucide="book-open"></i>
+                                        <input type="text" id="nombre_programa_aprendiz" readonly class="input-readonly">
+                                    </div>
+                                </div>
+                            </div>
 
                             <div class="form-actions">
                                 <button type="button" class="btn btn-secondary btn-back-v1">
@@ -441,6 +458,12 @@
                             <option value="completos">Completos</option>
                             <option value="incompletos">Incompletos</option>
                         </select>
+                        <select id="admin-role-filter">
+                            <option value="todos">Todos los roles</option>
+                            <option value="APRENDIZ">Aprendiz</option>
+                            <option value="INSTRUCTOR">Instructor</option>
+                            <option value="ADMINISTRATIVO">Administrativo</option>
+                        </select>
                         <select id="admin-page-size">
                             <option value="10">10 registros</option>
                             <option value="50">50 registros</option>
@@ -453,7 +476,8 @@
                         <table id="users-table">
                             <thead>
                                 <tr>
-                                    <th>Aprendiz / Documento</th>
+                                    <th>Persona / Documento</th>
+                                    <th>Rol / Ficha / Programa</th>
                                     <th>Contacto</th>
                                     <th>Archivos</th>
                                     <th>Estado</th>

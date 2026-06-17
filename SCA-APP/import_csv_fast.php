@@ -2,7 +2,7 @@
 require_once __DIR__ . '/api/db.php';
 $pdo = getPDOConnection();
 
-$csvFile = __DIR__ . '/../requerimientos/adjuntos/LISTADO_FALTANTE_INS_ADM.csv';
+$csvFile = __DIR__ . '/../requerimientos/adjuntos/sca-cide_aprendices.csv';
 
 if (!file_exists($csvFile)) {
     die("CSV file not found: $csvFile\n");
@@ -24,29 +24,37 @@ if ($handle !== FALSE) {
         while (($data = @fgetcsv($handle, 1000, ";")) !== FALSE) {
             if (count($data) < 8) continue;
             
-            $id = trim($data[0]);
-            $nombre = trim($data[1]);
-            $correo = trim($data[2]);
-            $telefono = trim($data[3]);
-            $rol = trim($data[7]);
+            $id = trim($data[0] ?? '');
+            $nombre = trim($data[1] ?? '');
+            $correo = trim($data[2] ?? '');
+            $telefono = trim($data[3] ?? '');
+            $rol = trim($data[7] ?? '');
+            $ficha = isset($data[8]) ? trim($data[8]) : NULL;
+            $programa = isset($data[9]) ? trim($data[9]) : NULL;
+            
+            if ($ficha === '') $ficha = NULL;
+            if ($programa === '') $programa = NULL;
             
             if (!mb_check_encoding($nombre, 'UTF-8')) $nombre = mb_convert_encoding($nombre, 'UTF-8', 'ISO-8859-1');
             if (!mb_check_encoding($rol, 'UTF-8')) $rol = mb_convert_encoding($rol, 'UTF-8', 'ISO-8859-1');
+            if ($programa !== NULL && !mb_check_encoding($programa, 'UTF-8')) $programa = mb_convert_encoding($programa, 'UTF-8', 'ISO-8859-1');
             
             if (empty($id) || $id === 'ID' || $id === 'NUMERO DOCUMENTO') continue;
             
-            $values = array_merge($values, [$id, $nombre, $correo, $telefono, $rol]);
-            $placeholders[] = "(?, ?, ?, ?, ?)";
+            $values = array_merge($values, [$id, $nombre, $correo, $telefono, $rol, $ficha, $programa]);
+            $placeholders[] = "(?, ?, ?, ?, ?, ?, ?)";
             
             if (count($placeholders) >= $batchSize) {
                 $sql = "INSERT INTO sca_cide_aprendices 
-                        (numero_documento_aprendiz, nombre_completo_aprendiz, correo_electronico_aprendiz, telefono_aprendiz, rol) 
+                        (numero_documento_aprendiz, nombre_completo_aprendiz, correo_electronico_aprendiz, telefono_aprendiz, rol, ficha_aprendiz, nombre_programa_aprendiz) 
                         VALUES " . implode(", ", $placeholders) . "
                         ON DUPLICATE KEY UPDATE 
                         nombre_completo_aprendiz = VALUES(nombre_completo_aprendiz),
                         correo_electronico_aprendiz = VALUES(correo_electronico_aprendiz),
                         telefono_aprendiz = VALUES(telefono_aprendiz),
-                        rol = VALUES(rol)";
+                        rol = VALUES(rol),
+                        ficha_aprendiz = VALUES(ficha_aprendiz),
+                        nombre_programa_aprendiz = VALUES(nombre_programa_aprendiz)";
                 $stmt = $pdo->prepare($sql);
                 $stmt->execute($values);
                 
@@ -58,13 +66,15 @@ if ($handle !== FALSE) {
         // Final batch
         if (count($placeholders) > 0) {
             $sql = "INSERT INTO sca_cide_aprendices 
-                    (numero_documento_aprendiz, nombre_completo_aprendiz, correo_electronico_aprendiz, telefono_aprendiz, rol) 
+                    (numero_documento_aprendiz, nombre_completo_aprendiz, correo_electronico_aprendiz, telefono_aprendiz, rol, ficha_aprendiz, nombre_programa_aprendiz) 
                     VALUES " . implode(", ", $placeholders) . "
                     ON DUPLICATE KEY UPDATE 
                     nombre_completo_aprendiz = VALUES(nombre_completo_aprendiz),
                     correo_electronico_aprendiz = VALUES(correo_electronico_aprendiz),
                     telefono_aprendiz = VALUES(telefono_aprendiz),
-                    rol = VALUES(rol)";
+                    rol = VALUES(rol),
+                    ficha_aprendiz = VALUES(ficha_aprendiz),
+                    nombre_programa_aprendiz = VALUES(nombre_programa_aprendiz)";
             $stmt = $pdo->prepare($sql);
             $stmt->execute($values);
         }

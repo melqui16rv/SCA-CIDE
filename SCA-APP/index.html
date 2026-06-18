@@ -415,9 +415,14 @@
             <div class="card dashboard-card">
                 <div class="card-header dashboard-header">
                     <h2>Gestión de Aprendices</h2>
-                    <button type="button" class="btn btn-secondary btn-sm" id="btn-logout">
-                        <i data-lucide="log-out"></i> Cerrar Sesión
-                    </button>
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <button type="button" class="btn btn-outline btn-sm" id="btn-view-diagram">
+                            <i data-lucide="git-merge"></i> Diagrama
+                        </button>
+                        <button type="button" class="btn btn-secondary btn-sm" id="btn-logout">
+                            <i data-lucide="log-out"></i> Cerrar Sesión
+                        </button>
+                    </div>
                 </div>
                 <div class="card-body">
 
@@ -510,6 +515,25 @@
         <div id="loading-overlay" class="hidden">
             <div class="spinner"></div>
             <p id="loading-text">Procesando...</p>
+        </div>
+
+        <!-- ══════════════════════════════════════════════════
+             Vista 5: Admin Diagrama DrawIO
+        ══════════════════════════════════════════════════ -->
+        <div id="admin-diagram-view" class="view hidden">
+            <div class="card dashboard-card" style="display: flex; flex-direction: column; height: 85vh;">
+                <div class="card-header dashboard-header" style="flex: 0 0 auto;">
+                    <div style="display:flex; align-items:center; gap: 12px;">
+                        <button type="button" class="btn-icon btn-secondary" id="btn-diagram-back" title="Volver al Dashboard">
+                            <i data-lucide="arrow-left"></i>
+                        </button>
+                        <h2 style="margin:0;">Diagrama de Flujo - Carnetización</h2>
+                    </div>
+                </div>
+                <div class="card-body" style="flex: 1 1 auto; padding: 0; position: relative; min-height: 400px;">
+                    <iframe id="diagram-iframe" frameborder="0" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-bottom-left-radius: var(--radius); border-bottom-right-radius: var(--radius);"></iframe>
+                </div>
+            </div>
         </div>
     </div>
 

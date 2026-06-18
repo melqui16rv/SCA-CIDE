@@ -304,6 +304,22 @@ const Admin = {
         document.getElementById('btn-next-page').onclick = () => {
             this.state.currentPage++; this.render();
         };
+
+        const btnDiagram = document.getElementById('btn-view-diagram');
+        if (btnDiagram) {
+            btnDiagram.onclick = () => {
+                const iframe = document.getElementById('diagram-iframe');
+                if (iframe && !iframe.src.includes('carnetizacion.drawio.html')) {
+                    iframe.src = 'assets/docs/carnetizacion.drawio.html';
+                }
+                UI.showView('admin-diagram-view');
+            };
+        }
+
+        const btnDiagramBack = document.getElementById('btn-diagram-back');
+        if (btnDiagramBack) {
+            btnDiagramBack.onclick = () => UI.showView('admin-dashboard');
+        }
     },
 
     bindToggleEvents() {

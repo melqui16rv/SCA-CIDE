@@ -1,0 +1,13 @@
+A modern, professional, and vibrant promotional poster design for an institutional ID card registration campaign. 
+Color palette: institutional colors using shades of green, white, and dark blue, with a clean and tech-oriented aesthetic. 
+
+Main Title (in large, modern, bold typography): "Actualiza tus Datos"
+Subtitle: "Proceso de Carnetización Institucional"
+
+Visual Elements: Include attractive, modern vector illustrations or 3D icons related to the process, such as a futuristic ID card floating, a smartphone capturing a photo, and digital network icons. The design should look premium, engaging, and welcoming.
+
+CRITICAL REQUIREMENT 1: Leave a prominent, completely empty white square box in the bottom right or center area. This blank space is strictly reserved for a real QR code to be added later, so it must not have any text, patterns, or drawings inside it.
+
+CRITICAL REQUIREMENT 2: At the bottom of the poster, clearly display the following exact URL in large, highly readable font: "carnetizacion.vermqen.com"
+
+The overall composition should have enough negative space to allow easy text editing and layout adjustments in Canva.

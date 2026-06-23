@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Registro Inicial - SCA-CIDE</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Archivos CSS -->
+    <link rel="stylesheet" href="/assets/css/styles.css">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div id="app" class="app-container">
+        
+        <!-- Vista 1: Ingreso de Documento -->
+        <div id="view-doc" class="view active">
+            <div class="card card-sm fade-in">
+                <div class="card-header">
+                    <div class="brand-logo">
+                        <i data-lucide="id-card"></i>
+                    </div>
+                    <h2>Registro de Datos Iniciales</h2>
+                    <p class="subtitle">Validación inicial</p>
+                </div>
+                <div class="card-body">
+                    <form id="doc-form">
+                        <div class="form-group">
+                            <label for="documento">Número de Documento</label>
+                            <div class="input-with-icon">
+                                <i data-lucide="credit-card"></i>
+                                <input type="text" inputmode="numeric" id="documento" name="documento" required placeholder="Ej: 1234567890">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">
+                            Continuar <i data-lucide="arrow-right"></i>
+                        </button>
+                    </form>
+                    <div id="doc-error" class="alert alert-danger hidden" style="margin-top: 15px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vista 2: Formulario de Datos -->
+        <div id="view-form" class="view">
+            <div class="card form-card fade-in">
+                <div class="card-header">
+                    <h2>Completar Información</h2>
+                    <p class="subtitle">Por favor, diligencie sus datos de contacto y vinculación.</p>
+                </div>
+                <div class="card-body">
+                    <form id="data-form">
+                        
+                        <div class="form-group">
+                            <label for="nombre">Nombre Completo</label>
+                            <div class="input-with-icon">
+                                <i data-lucide="user"></i>
+                                <input type="text" id="nombre" name="nombre" required placeholder="Nombres y Apellidos">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="correo">Correo Electrónico SENA</label>
+                            <div class="input-with-icon">
+                                <i data-lucide="mail"></i>
+                                <input type="email" id="correo" name="correo" required placeholder="usuario@sena.edu.co">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="telefono">Teléfono</label>
+                            <div class="input-with-icon">
+                                <i data-lucide="phone"></i>
+                                <input type="text" inputmode="tel" id="telefono" name="telefono" required placeholder="Número de contacto">
+                            </div>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="rol">ROL</label>
+                                <div class="input-with-icon">
+                                    <i data-lucide="briefcase"></i>
+                                    <select id="rol" name="rol" required style="padding-left: 42px;">
+                                        <option value="" disabled selected>Seleccione...</option>
+                                        <option value="INSTRUCTOR">INSTRUCTOR</option>
+                                        <option value="ADMINISTRATIVO">ADMINISTRATIVO</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="vinculacion">VINCULACIÓN</label>
+                                <div class="input-with-icon">
+                                    <i data-lucide="file-text"></i>
+                                    <select id="vinculacion" name="vinculacion" required style="padding-left: 42px;">
+                                        <option value="" disabled selected>Seleccione...</option>
+                                        <option value="FUNCIONARIO">FUNCIONARIO</option>
+                                        <option value="CONTRATISTA">CONTRATISTA</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-actions" style="margin-top: 30px;">
+                            <button type="button" class="btn btn-secondary" id="btn-back">
+                                <i data-lucide="arrow-left"></i> Volver
+                            </button>
+                            <button type="submit" class="btn btn-primary" id="btn-submit">
+                                <i data-lucide="save"></i> Registrar
+                            </button>
+                        </div>
+                    </form>
+                    <div id="form-error" class="alert alert-danger hidden" style="margin-top: 15px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vista 3: Éxito -->
+        <div id="view-success" class="view">
+            <div class="card success-card fade-in" style="text-align: center; padding: 40px 20px;">
+                <div class="success-icon" style="background-color: var(--success); color: white; width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                    <i data-lucide="check" style="width: 40px; height: 40px;"></i>
+                </div>
+                <h2>¡Registro Exitoso!</h2>
+                <p class="subtitle" style="margin-top: 15px;">Sus datos han sido guardados correctamente en la base de datos.</p>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 10px; margin-bottom: 25px;">En una fase posterior se le solicitará cargar su foto y documento.</p>
+                <button type="button" class="btn btn-primary btn-block" id="btn-finish">
+                    Finalizar <i data-lucide="arrow-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div id="loading-overlay" class="hidden">
+            <div class="spinner"></div>
+            <p id="loading-text">Procesando...</p>
+        </div>
+
+    </div>
+
+    <!-- Archivo JS -->
+    <script src="/formulario_registro_datos_iniciales/app.js?v=5"></script>
+</body>
+</html>

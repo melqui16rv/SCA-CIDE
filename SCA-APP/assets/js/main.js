@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        UI.showLoading('Verificando aprendiz...');
+        UI.showLoading('Verificando documento...');
         const res = await API.checkDocument(doc);
         UI.hideLoading();
 

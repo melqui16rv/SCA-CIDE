@@ -305,6 +305,25 @@ const Admin = {
             this.state.currentPage++; this.render();
         };
 
+        const btnCopyUrl = document.getElementById('btn-copy-form-url');
+        if (btnCopyUrl) {
+            btnCopyUrl.onclick = async () => {
+                const url = window.location.origin + '/formulario_registro_datos_iniciales/';
+                try {
+                    await navigator.clipboard.writeText(url);
+                    const originalHtml = btnCopyUrl.innerHTML;
+                    btnCopyUrl.innerHTML = '<i data-lucide="check"></i> Copiado';
+                    if (window.lucide) window.lucide.createIcons();
+                    setTimeout(() => {
+                        btnCopyUrl.innerHTML = originalHtml;
+                        if (window.lucide) window.lucide.createIcons();
+                    }, 2000);
+                } catch (err) {
+                    alert('No se pudo copiar automáticamente. URL: ' + url);
+                }
+            };
+        }
+
         const btnDiagram = document.getElementById('btn-view-diagram');
         if (btnDiagram) {
             btnDiagram.onclick = () => {

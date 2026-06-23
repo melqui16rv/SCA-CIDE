@@ -13,13 +13,14 @@ try {
     $pdo = getPDOConnection();
     
     // Validar datos requeridos
-    $required_fields = ['documento', 'nombre', 'correo', 'telefono', 'rol', 'vinculacion'];
+    $required_fields = ['tipo_documento', 'documento', 'nombre', 'correo', 'telefono', 'rol', 'vinculacion'];
     foreach ($required_fields as $field) {
         if (empty($_POST[$field])) {
             throw new Exception("El campo '$field' es obligatorio.");
         }
     }
 
+    $tipo_documento = $_POST['tipo_documento'];
     $documento = preg_replace('/[^0-9]/', '', $_POST['documento']);
     $nombre = trim($_POST['nombre']);
     $correo = filter_var(trim($_POST['correo']), FILTER_SANITIZE_EMAIL);
@@ -34,11 +35,12 @@ try {
     // Insertar en la BD
     $stmt = $pdo->prepare('
         INSERT INTO personal_cundinamarca 
-        (numero_documento, nombre_completo, correo_electronico, telefono, rol, vinculacion) 
-        VALUES (?, ?, ?, ?, ?, ?)
+        (tipo_documento, numero_documento, nombre_completo, correo_electronico, telefono, rol, vinculacion) 
+        VALUES (?, ?, ?, ?, ?, ?, ?)
     ');
     
     $success = $stmt->execute([
+        $tipo_documento,
         $documento,
         $nombre,
         $correo,

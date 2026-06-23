@@ -415,19 +415,29 @@
             <div class="card dashboard-card">
                 <div class="card-header dashboard-header">
                     <h2>Gestión de Aprendices</h2>
-                    <div style="display:flex; gap:10px; align-items:center;">
-                        <button type="button" class="btn btn-outline btn-sm" id="btn-copy-form-url" title="Copiar URL del Formulario de Datos Iniciales">
-                            <i data-lucide="link"></i> Copiar URL
-                        </button>
-                        <a href="/formulario_registro_datos_iniciales/" target="_blank" class="btn btn-outline btn-sm" title="Ir al Formulario de Datos Iniciales">
-                            <i data-lucide="external-link"></i> Formulario
-                        </a>
-                        <button type="button" class="btn btn-outline btn-sm" id="btn-view-diagram">
-                            <i data-lucide="git-merge"></i> Diagrama
-                        </button>
-                        <button type="button" class="btn btn-secondary btn-sm" id="btn-logout">
-                            <i data-lucide="log-out"></i> Cerrar Sesión
-                        </button>
+                    <div style="display:flex; gap:20px; align-items:center; flex-wrap:wrap;">
+                        <!-- Grupo de Formulario -->
+                        <div style="display:flex; flex-direction:column; align-items:flex-end; background:var(--bg-color); padding:8px 12px; border-radius:8px; border:1px solid var(--border);">
+                            <span style="font-size:0.7rem; color:var(--text-sub); font-weight:700; margin-bottom:6px; letter-spacing:0.5px;">FORMULARIO DE REGISTRO INICIAL</span>
+                            <div style="display:flex; gap:8px;">
+                                <button type="button" class="btn btn-outline btn-sm" id="btn-copy-form-url" title="Copiar URL">
+                                    <i data-lucide="link"></i> Copiar URL
+                                </button>
+                                <a href="https://carnetizacion.vermqen.com/formulario_registro_datos_iniciales/" target="_blank" class="btn btn-primary btn-sm" title="Abrir Formulario">
+                                    <i data-lucide="external-link"></i> Abrir Formulario
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Otros Botones -->
+                        <div style="display:flex; gap:10px;">
+                            <button type="button" class="btn btn-outline btn-sm" id="btn-view-diagram">
+                                <i data-lucide="git-merge"></i> Diagrama
+                            </button>
+                            <button type="button" class="btn btn-secondary btn-sm" id="btn-logout">
+                                <i data-lucide="log-out"></i> Cerrar Sesión
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <div class="card-body">

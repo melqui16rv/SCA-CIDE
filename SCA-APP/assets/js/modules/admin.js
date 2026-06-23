@@ -308,7 +308,7 @@ const Admin = {
         const btnCopyUrl = document.getElementById('btn-copy-form-url');
         if (btnCopyUrl) {
             btnCopyUrl.onclick = async () => {
-                const url = window.location.origin + '/formulario_registro_datos_iniciales/';
+                const url = 'https://carnetizacion.vermqen.com/formulario_registro_datos_iniciales/';
                 try {
                     await navigator.clipboard.writeText(url);
                     const originalHtml = btnCopyUrl.innerHTML;

@@ -152,7 +152,7 @@ const Admin = {
         const filterFicha = document.getElementById('admin-ficha-filter') ? document.getElementById('admin-ficha-filter').value.trim() : '';
         this.state.itemsPerPage = parseInt(document.getElementById('admin-page-size').value) || 10;
 
-        let total = 0, validado = 0, pendiente = 0, incompletos = 0;
+        let total = 0, validado = 0, pendiente = 0, incompletos = 0, carnetEntregado = 0;
 
         // Calculate Metrics & Filter
         const filtered = this.state.users.filter(u => {
@@ -160,9 +160,11 @@ const Admin = {
             const hasFoto = !!u.ruta_foto_aprendiz;
             const hasDoc  = !!u.ruta_documento_identificacion_aprendiz;
             const isValid = u.estado_validacion === 'validado';
+            const isCarnetEntregado = u.estado_carnet === 'realizado';
 
             if (isValid) validado++; else pendiente++;
             if (!hasFoto || !hasDoc) incompletos++;
+            if (isCarnetEntregado) carnetEntregado++;
 
             if (filterStatus === 'validado' && !isValid) return false;
             if (filterStatus === 'no_validado' && isValid) return false;
@@ -189,6 +191,8 @@ const Admin = {
         document.getElementById('metric-validado').textContent = validado;
         document.getElementById('metric-no-validado').textContent = pendiente;
         document.getElementById('metric-incompletos').textContent = incompletos;
+        const metricCarnet = document.getElementById('metric-carnet-entregado');
+        if (metricCarnet) metricCarnet.textContent = carnetEntregado;
 
         // Pagination
         const totalPages = Math.ceil(filtered.length / this.state.itemsPerPage);
@@ -197,7 +201,7 @@ const Admin = {
 
         tbody.innerHTML = pageUsers.length
             ? ''
-            : '<tr><td colspan="4" style="text-align:center; padding:32px; color:var(--text-muted);">No se encontraron registros.</td></tr>';
+            : '<tr><td colspan="6" style="text-align:center; padding:32px; color:var(--text-muted);">No se encontraron registros.</td></tr>';
 
         pageUsers.forEach(u => {
             const tr = document.createElement('tr');
@@ -255,12 +259,22 @@ const Admin = {
                         <span class="badge ${isChecked ? 'success' : 'pending'}">${isChecked ? 'Válido' : 'Pendiente'}</span>
                     </div>
                 </td>
+                <td>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <label class="toggle-switch">
+                            <input type="checkbox" class="carnet-toggle" data-doc="${doc}" ${u.estado_carnet === 'realizado' ? 'checked' : ''}>
+                            <span class="slider" style="${u.estado_carnet === 'realizado' ? '--toggle-active: #8b5cf6;' : ''}"></span>
+                        </label>
+                        <span class="badge" style="${u.estado_carnet === 'realizado' ? 'background:#ede9fe; color:#8b5cf6;' : ''}">${u.estado_carnet === 'realizado' ? 'Realizado' : 'Pendiente'}</span>
+                    </div>
+                </td>
             `;
             tbody.appendChild(tr);
         });
 
         this.updatePagination(totalPages);
         this.bindToggleEvents();
+        this.bindCarnetToggleEvents();
         this.bindDownloadButtons();
     },
 
@@ -355,6 +369,27 @@ const Admin = {
                     this.render();
                 } else {
                     alert('No se pudo actualizar el estado.');
+                    e.target.checked = !e.target.checked;
+                }
+                e.target.disabled = false;
+            };
+        });
+    },
+
+    bindCarnetToggleEvents() {
+        document.querySelectorAll('.carnet-toggle').forEach(t => {
+            t.onchange = async (e) => {
+                const doc = e.target.dataset.doc;
+                const newState = e.target.checked ? 'realizado' : 'pendiente';
+                e.target.disabled = true;
+
+                const res = await API.toggleCarnet(doc, newState);
+                if (res.success) {
+                    const idx = this.state.users.findIndex(u => u.numero_documento_aprendiz === doc);
+                    if (idx > -1) this.state.users[idx].estado_carnet = newState;
+                    this.render();
+                } else {
+                    alert('No se pudo actualizar el estado del carnet.');
                     e.target.checked = !e.target.checked;
                 }
                 e.target.disabled = false;

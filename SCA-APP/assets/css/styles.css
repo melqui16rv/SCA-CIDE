@@ -1028,6 +1028,48 @@ tr:hover td { background: var(--bg-input); }
     color: var(--text-sub);
 }
 
+/* ── Toggle Switch ─────────────────────────────────────── */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 38px;
+    height: 20px;
+    cursor: pointer;
+}
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+.toggle-switch .slider {
+    position: absolute;
+    inset: 0;
+    background-color: #cbd5e1;
+    border-radius: 20px;
+    transition: 0.25s ease;
+}
+.toggle-switch .slider::before {
+    content: "";
+    position: absolute;
+    height: 14px;
+    width: 14px;
+    left: 3px;
+    bottom: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: 0.25s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+.toggle-switch input:checked + .slider {
+    background-color: var(--success, #16a34a);
+}
+.toggle-switch input:checked + .slider[style*="--toggle-active"] {
+    background-color: var(--toggle-active);
+}
+.toggle-switch input:checked + .slider::before {
+    transform: translateX(18px);
+}
+
 /* ── Utilities ───────────────────────────────────────────── */
 .hidden { display: none !important; }
 

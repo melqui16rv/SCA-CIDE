@@ -76,6 +76,18 @@ const API = {
     },
 
     /**
+     * Toggles the carnet delivery status of a user
+     */
+    async toggleCarnet(documento, estado) {
+        try {
+            const res = await fetch(`api/admin.php?action=toggle_carnet&documento=${documento}&estado=${estado}`);
+            return await res.json();
+        } catch (err) {
+            return { success: false, message: 'Error de conexión.' };
+        }
+    },
+
+    /**
      * Admin Logout
      */
     async logout() {

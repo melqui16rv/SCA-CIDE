@@ -364,7 +364,7 @@ const Admin = {
 
                 const res = await API.toggleValidation(doc, newState);
                 if (res.success) {
-                    const idx = this.state.users.findIndex(u => u.numero_documento_aprendiz === doc);
+                    const idx = this.state.users.findIndex(u => u.numero_documento_aprendiz == doc);
                     if (idx > -1) this.state.users[idx].estado_validacion = newState;
                     this.render();
                 } else {
@@ -385,7 +385,7 @@ const Admin = {
 
                 const res = await API.toggleCarnet(doc, newState);
                 if (res.success) {
-                    const idx = this.state.users.findIndex(u => u.numero_documento_aprendiz === doc);
+                    const idx = this.state.users.findIndex(u => u.numero_documento_aprendiz == doc);
                     if (idx > -1) this.state.users[idx].estado_carnet = newState;
                     this.render();
                 } else {

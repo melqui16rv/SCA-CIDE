@@ -9,7 +9,7 @@ const API = {
      */
     async checkDocument(documento) {
         try {
-            const res = await fetch(`api/check_document.php?documento=${encodeURIComponent(documento)}`);
+            const res = await fetch(`api/check_document.php?documento=${encodeURIComponent(documento)}&_t=${Date.now()}`, { cache: 'no-store' });
             return await res.json();
         } catch (err) {
             console.error('API Error (checkDocument):', err);
@@ -56,7 +56,7 @@ const API = {
      */
     async listUsers() {
         try {
-            const res = await fetch('api/admin.php?action=list');
+            const res = await fetch(`api/admin.php?action=list&_t=${Date.now()}`, { cache: 'no-store' });
             return await res.json();
         } catch (err) {
             return { success: false, message: 'Error al cargar los datos.' };
@@ -68,7 +68,7 @@ const API = {
      */
     async toggleValidation(documento, estado) {
         try {
-            const res = await fetch(`api/admin.php?action=toggle_validation&documento=${documento}&estado=${estado}`);
+            const res = await fetch(`api/admin.php?action=toggle_validation&documento=${documento}&estado=${estado}&_t=${Date.now()}`, { cache: 'no-store' });
             return await res.json();
         } catch (err) {
             return { success: false, message: 'Error de conexión.' };
@@ -80,7 +80,7 @@ const API = {
      */
     async toggleCarnet(documento, estado) {
         try {
-            const res = await fetch(`api/admin.php?action=toggle_carnet&documento=${documento}&estado=${estado}`);
+            const res = await fetch(`api/admin.php?action=toggle_carnet&documento=${documento}&estado=${estado}&_t=${Date.now()}`, { cache: 'no-store' });
             return await res.json();
         } catch (err) {
             return { success: false, message: 'Error de conexión.' };
@@ -91,7 +91,7 @@ const API = {
      * Admin Logout
      */
     async logout() {
-        return await fetch('api/admin.php?action=logout');
+        return await fetch(`api/admin.php?action=logout&_t=${Date.now()}`, { cache: 'no-store' });
     }
 };
 

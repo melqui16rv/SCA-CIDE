@@ -170,6 +170,8 @@ const Admin = {
             if (filterStatus === 'no_validado' && isValid) return false;
             if (filterStatus === 'completos' && (!hasFoto || !hasDoc)) return false;
             if (filterStatus === 'incompletos' && (hasFoto && hasDoc)) return false;
+            if (filterStatus === 'carnet_realizado' && !isCarnetEntregado) return false;
+            if (filterStatus === 'carnet_pendiente' && isCarnetEntregado) return false;
 
             if (filterRole !== 'todos' && u.rol !== filterRole) return false;
             
@@ -272,7 +274,7 @@ const Admin = {
             tbody.appendChild(tr);
         });
 
-        this.updatePagination(totalPages);
+        this.updatePagination(totalPages, filtered.length);
         this.bindToggleEvents();
         this.bindCarnetToggleEvents();
         this.bindDownloadButtons();
@@ -293,12 +295,12 @@ const Admin = {
         });
     },
 
-    updatePagination(totalPages) {
+    updatePagination(totalPages, totalItems) {
         const info = document.getElementById('pagination-info');
         const prev = document.getElementById('btn-prev-page');
         const next = document.getElementById('btn-next-page');
 
-        if (info) info.textContent = `Página ${this.state.currentPage} de ${totalPages || 1}`;
+        if (info) info.textContent = `Página ${this.state.currentPage} de ${totalPages || 1} (${totalItems} registros)`;
         if (prev) prev.disabled = this.state.currentPage <= 1;
         if (next) next.disabled = this.state.currentPage >= totalPages;
     },

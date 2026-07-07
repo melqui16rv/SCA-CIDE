@@ -14,11 +14,12 @@ try {
     }
 
     $documento = $_POST['documento'] ?? '';
+    $rh_aprendiz = $_POST['rh_aprendiz'] ?? '';
     $fecha_expedicion = $_POST['fecha_expedicion'] ?? '';
     $lugar_expedicion = $_POST['lugar_expedicion'] ?? '';
 
-    if (empty($documento) || empty($fecha_expedicion) || empty($lugar_expedicion)) {
-        throw new Exception('Faltan datos obligatorios (documento, fecha o lugar).');
+    if (empty($documento) || empty($rh_aprendiz) || empty($fecha_expedicion) || empty($lugar_expedicion)) {
+        throw new Exception('Faltan datos obligatorios (documento, RH, fecha o lugar).');
     }
 
     if (!isset($_FILES['foto']) || !isset($_FILES['documento_pdf'])) {
@@ -60,6 +61,7 @@ try {
     $stmt = $pdo->prepare('
         UPDATE sca_cide_aprendices 
         SET 
+            rh_aprendiz = ?,
             ruta_foto_aprendiz = ?, 
             fecha_expedicion_documento_identificacion_aprendiz = ?, 
             lugar_expedicion_documento_identificacion_aprendiz = ?, 
@@ -69,6 +71,7 @@ try {
     ');
 
     $success = $stmt->execute([
+        $rh_aprendiz,
         $fotoPathDB,
         $fecha_expedicion,
         $lugar_expedicion,

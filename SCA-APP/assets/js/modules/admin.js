@@ -216,7 +216,8 @@ const Admin = {
             tr.innerHTML = `
                 <td>
                     <strong>${u.nombre_completo_aprendiz}</strong><br>
-                    <small style="color:var(--text-muted)">CC ${doc}</small>
+                    <small style="color:var(--text-muted)">CC ${doc}</small><br>
+                    ${u.rh_aprendiz ? `<span class="badge" style="background:#fee2e2; color:#ef4444; margin-top:4px;">RH: ${u.rh_aprendiz}</span>` : ''}
                 </td>
                 <td>
                     <div style="font-size:0.85rem; line-height:1.7;">

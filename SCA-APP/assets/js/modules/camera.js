@@ -187,8 +187,8 @@ const Camera = {
             const cropH = isDoc ?  882 : 1066;
 
             const canvas = this.state.cropper.getCroppedCanvas({
-                width:  cropW,
-                height: cropH,
+                maxWidth:  cropW,
+                maxHeight: cropH,
                 imageSmoothingEnabled: true,
                 imageSmoothingQuality: 'high'
             });

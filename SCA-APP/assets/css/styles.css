@@ -268,7 +268,8 @@ label {
 }
 .input-with-icon input[type="text"],
 .input-with-icon input[type="email"],
-.input-with-icon input[type="password"] {
+.input-with-icon input[type="password"],
+.input-with-icon select {
     padding-left: 42px !important;
 }
 

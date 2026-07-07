@@ -33,6 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('nombre_completo').value = data.nombre_completo_aprendiz || '';
         document.getElementById('correo').value = data.correo_electronico_aprendiz || '';
         document.getElementById('telefono').value = data.telefono_aprendiz || '';
+        document.getElementById('rh_aprendiz').value = data.rh_aprendiz || '';
         
         const aprendizRow = document.getElementById('aprendiz-fields-row');
         if (data.rol === 'APRENDIZ') {
@@ -96,6 +97,12 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.onclick = () => {
             if (AppState.currentStep < 4) {
                 // Validation before moving
+                if (AppState.currentStep === 1) {
+                    if (!document.getElementById('rh_aprendiz').value) {
+                        alert('Por favor selecciona tu grupo sanguíneo (RH).');
+                        return;
+                    }
+                }
                 if (AppState.currentStep === 2) {
                     if (!document.getElementById('fecha_expedicion').value || !Location.getValue()) {
                         alert('Por favor completa la fecha y el lugar de expedición.');
@@ -341,6 +348,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Build FormData
             const fd = new FormData();
             fd.append('documento', AppState.currentDocumento);
+            fd.append('rh_aprendiz', document.getElementById('rh_aprendiz').value);
             fd.append('fecha_expedicion', document.getElementById('fecha_expedicion').value);
             fd.append('lugar_expedicion', Location.getValue());
             fd.append('foto', AppState.fotoBlob, `${AppState.currentDocumento}.jpg`);

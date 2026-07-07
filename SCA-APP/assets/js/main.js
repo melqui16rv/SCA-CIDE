@@ -1,12 +1,12 @@
 /**
  * Main Orchestrator - Binds all modules and handles core flow
  */
-import API from './modules/api.js?v=1.2';
-import UI from './modules/ui.js?v=1.2';
-import Camera from './modules/camera.js?v=1.2';
-import Utils from './modules/utils.js?v=1.2';
-import Location from './modules/location.js?v=1.2';
-import Admin from './modules/admin.js?v=1.2';
+import API from './modules/api.js?v=1.3';
+import UI from './modules/ui.js?v=1.3';
+import Camera from './modules/camera.js?v=1.3';
+import Utils from './modules/utils.js?v=1.3';
+import Location from './modules/location.js?v=1.3';
+import Admin from './modules/admin.js?v=1.3';
 
 document.addEventListener('DOMContentLoaded', () => {
     // State

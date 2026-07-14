@@ -148,11 +148,14 @@ const Admin = {
         const tbody = document.getElementById('users-tbody');
         const searchTerm = document.getElementById('admin-search').value.toLowerCase();
         const filterStatus = document.getElementById('admin-filter').value;
-        const filterRole = document.getElementById('admin-role-filter') ? document.getElementById('admin-role-filter').value : 'todos';
+        
+        const roleCheckboxes = document.querySelectorAll('.role-checkbox:checked');
+        const selectedRoles = Array.from(roleCheckboxes).map(cb => cb.value);
+
         const filterFicha = document.getElementById('admin-ficha-filter') ? document.getElementById('admin-ficha-filter').value.trim() : '';
         this.state.itemsPerPage = parseInt(document.getElementById('admin-page-size').value) || 10;
 
-        let total = 0, validado = 0, pendiente = 0, incompletos = 0, carnetEntregado = 0;
+        let total = 0, validado = 0, pendiente = 0, incompletos = 0, carnetEntregado = 0, carnetNoRealizar = 0;
 
         // Calculate Metrics & Filter
         const filtered = this.state.users.filter(u => {
@@ -161,19 +164,22 @@ const Admin = {
             const hasDoc  = !!u.ruta_documento_identificacion_aprendiz;
             const isValid = u.estado_validacion === 'validado';
             const isCarnetEntregado = u.estado_carnet === 'realizado';
+            const isCarnetNoRealizar = u.estado_carnet === 'no realizar';
 
             if (isValid) validado++; else pendiente++;
             if (!hasFoto || !hasDoc) incompletos++;
             if (isCarnetEntregado) carnetEntregado++;
+            if (isCarnetNoRealizar) carnetNoRealizar++;
 
             if (filterStatus === 'validado' && !isValid) return false;
             if (filterStatus === 'no_validado' && isValid) return false;
             if (filterStatus === 'completos' && (!hasFoto || !hasDoc)) return false;
             if (filterStatus === 'incompletos' && (hasFoto && hasDoc)) return false;
             if (filterStatus === 'carnet_realizado' && !isCarnetEntregado) return false;
-            if (filterStatus === 'carnet_pendiente' && isCarnetEntregado) return false;
+            if (filterStatus === 'carnet_pendiente' && (isCarnetEntregado || isCarnetNoRealizar)) return false;
+            if (filterStatus === 'carnet_no_realizar' && !isCarnetNoRealizar) return false;
 
-            if (filterRole !== 'todos' && u.rol !== filterRole) return false;
+            if (u.rol && !selectedRoles.includes(u.rol)) return false;
             
             if (filterFicha !== '') {
                 const fStr = (u.ficha_aprendiz || '').toLowerCase();
@@ -195,6 +201,11 @@ const Admin = {
         document.getElementById('metric-incompletos').textContent = incompletos;
         const metricCarnet = document.getElementById('metric-carnet-entregado');
         if (metricCarnet) metricCarnet.textContent = carnetEntregado;
+        const metricFaltante = document.getElementById('metric-carnet-faltante');
+        const faltantesGenerar = total - carnetNoRealizar - carnetEntregado;
+        if (metricFaltante) metricFaltante.textContent = faltantesGenerar;
+
+        this.renderCharts(carnetEntregado, faltantesGenerar, carnetNoRealizar, validado, pendiente);
 
         // Pagination
         const totalPages = Math.ceil(filtered.length / this.state.itemsPerPage);
@@ -207,6 +218,9 @@ const Admin = {
 
         pageUsers.forEach(u => {
             const tr = document.createElement('tr');
+            if (u.estado_carnet === 'no realizar') {
+                tr.style.backgroundColor = '#fff7ed'; // Naranja tenue
+            }
             const isChecked = u.estado_validacion === 'validado' ? 'checked' : '';
             // Strip the SCA-APP/ prefix so paths are relative to the web root
             const fotoUrl = (u.ruta_foto_aprendiz || '').replace(/^SCA-APP\//, '');
@@ -215,7 +229,9 @@ const Admin = {
 
             tr.innerHTML = `
                 <td>
-                    <strong>${u.nombre_completo_aprendiz}</strong><br>
+                    <div style="max-width: 200px; word-break: break-word;" title="${u.nombre_completo_aprendiz}">
+                        <strong>${u.nombre_completo_aprendiz}</strong>
+                    </div>
                     <small style="color:var(--text-muted)">CC ${doc}</small><br>
                     ${u.rh_aprendiz ? `<span class="badge" style="background:#fee2e2; color:#ef4444; margin-top:4px;">RH: ${u.rh_aprendiz}</span>` : ''}
                 </td>
@@ -224,17 +240,15 @@ const Admin = {
                         <span class="badge" style="background:#e2e8f0; color:#475569;">${u.rol || 'N/A'}</span><br>
                         ${u.rol === 'APRENDIZ' ? 
                             `<span style="color:var(--text-muted); font-size:0.72rem; text-transform:uppercase; font-weight:700;">Ficha:</span> ${u.ficha_aprendiz || '—'}<br>
-                             <span style="color:var(--text-muted); font-size:0.72rem; text-transform:uppercase; font-weight:700;">Programa:</span> <span style="font-size:0.75rem;">${u.nombre_programa_aprendiz || '—'}</span>` 
+                             <div style="display:flex; flex-direction:column; margin-bottom:6px;">
+                                 <span style="color:var(--text-muted); font-size:0.72rem; text-transform:uppercase; font-weight:700;">Programa:</span>
+                                 <span title="${u.nombre_programa_aprendiz || ''}" style="font-size:0.75rem; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block;">${u.nombre_programa_aprendiz || '—'}</span>
+                             </div>` 
                             : ''
                         }
-                    </div>
-                </td>
-                <td>
-                    <div style="font-size:0.85rem; line-height:1.7;">
-                        <span style="color:var(--text-muted); font-size:0.72rem; text-transform:uppercase; font-weight:700;">Correo</span><br>
-                        ${u.correo_electronico_aprendiz || '—'}<br>
-                        <span style="color:var(--text-muted); font-size:0.72rem; text-transform:uppercase; font-weight:700;">Teléfono</span><br>
-                        ${u.telefono_aprendiz || '—'}
+                        <button class="btn-sm btn-secondary btn-show-contact" data-name="${u.nombre_completo_aprendiz}" data-email="${u.correo_electronico_aprendiz || ''}" data-phone="${u.telefono_aprendiz || ''}" title="Ver contacto" style="font-size: 0.75rem; padding: 2px 8px; margin-top: 4px; display:inline-flex; align-items:center;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>Contacto
+                        </button>
                     </div>
                 </td>
                 <td>
@@ -266,9 +280,20 @@ const Admin = {
                     <div style="display:flex; align-items:center; gap:10px;">
                         <label class="toggle-switch">
                             <input type="checkbox" class="carnet-toggle" data-doc="${doc}" ${u.estado_carnet === 'realizado' ? 'checked' : ''}>
-                            <span class="slider" style="${u.estado_carnet === 'realizado' ? '--toggle-active: #8b5cf6;' : ''}"></span>
+                            <span class="slider" style="${u.estado_carnet === 'realizado' ? '--toggle-active: #8b5cf6;' : (u.estado_carnet === 'no realizar' ? 'background-color: #fb923c;' : '')}"></span>
                         </label>
-                        <span class="badge" style="${u.estado_carnet === 'realizado' ? 'background:#ede9fe; color:#8b5cf6;' : ''}">${u.estado_carnet === 'realizado' ? 'Realizado' : 'Pendiente'}</span>
+                        <span class="badge" style="${
+                            u.estado_carnet === 'realizado' ? 'background:#ede9fe; color:#8b5cf6;' : 
+                            (u.estado_carnet === 'no realizar' ? 'background:#ffedd5; color:#ea580c;' : '')
+                        }">${
+                            u.estado_carnet === 'realizado' ? 'Realizado' : 
+                            (u.estado_carnet === 'no realizar' ? 'No realizar' : 'Pendiente')
+                        }</span>
+                        ${u.estado_carnet !== 'no realizar' ? 
+                            `<button class="btn-sm btn-no-realizar" data-doc="${doc}" title="Anular (No realizar)" style="background:transparent; border:none; color:var(--text-muted); cursor:pointer; padding:4px;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                             </button>` : ''
+                        }
                     </div>
                 </td>
             `;
@@ -278,6 +303,8 @@ const Admin = {
         this.updatePagination(totalPages, filtered.length);
         this.bindToggleEvents();
         this.bindCarnetToggleEvents();
+        this.bindNoRealizarEvents();
+        this.bindContactModalEvents();
         this.bindDownloadButtons();
     },
 
@@ -306,11 +333,116 @@ const Admin = {
         if (next) next.disabled = this.state.currentPage >= totalPages;
     },
 
+    renderCharts(carnetRealizado, carnetFaltante, carnetNoRealizar, validado, pendiente) {
+        if (!window.Chart) return;
+        
+        const ctxCarnet = document.getElementById('chartCarnet');
+        const ctxValidacion = document.getElementById('chartValidacion');
+        
+        if (ctxCarnet) {
+            if (this.state.chartCarnetInstance) {
+                this.state.chartCarnetInstance.data.datasets[0].data = [carnetRealizado, carnetFaltante, carnetNoRealizar];
+                this.state.chartCarnetInstance.update();
+            } else {
+                this.state.chartCarnetInstance = new Chart(ctxCarnet, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Realizado', 'Falta Generar', 'No Realizar'],
+                        datasets: [{
+                            data: [carnetRealizado, carnetFaltante, carnetNoRealizar],
+                            backgroundColor: ['#8b5cf6', '#f59e0b', '#e2e8f0'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } } }
+                });
+            }
+        }
+        
+        if (ctxValidacion) {
+            if (this.state.chartValidacionInstance) {
+                this.state.chartValidacionInstance.data.datasets[0].data = [validado, pendiente];
+                this.state.chartValidacionInstance.update();
+            } else {
+                this.state.chartValidacionInstance = new Chart(ctxValidacion, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Validados', 'Pendientes'],
+                        datasets: [{
+                            data: [validado, pendiente],
+                            backgroundColor: ['#10b981', '#ef4444'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } } }
+                });
+            }
+        }
+    },
+
+    bindContactModalEvents() {
+        document.querySelectorAll('.btn-show-contact').forEach(btn => {
+            btn.onclick = () => {
+                const name = btn.dataset.name;
+                const email = btn.dataset.email || 'No especificado';
+                const phone = btn.dataset.phone || 'No especificado';
+                
+                document.getElementById('contact-modal-name').textContent = name;
+                document.getElementById('contact-modal-email').textContent = email;
+                document.getElementById('contact-modal-phone').textContent = phone;
+                
+                document.getElementById('contact-modal').classList.remove('hidden');
+            };
+        });
+        
+        const closeBtn = document.getElementById('btn-close-contact-modal');
+        if(closeBtn) {
+            closeBtn.onclick = () => {
+                document.getElementById('contact-modal').classList.add('hidden');
+            };
+        }
+    },
+
+    bindNoRealizarEvents() {
+        document.querySelectorAll('.btn-no-realizar').forEach(btn => {
+            btn.onclick = async (e) => {
+                if(!confirm('¿Estás seguro de marcar este carnet como "No realizar"?')) return;
+                const doc = e.currentTarget.dataset.doc;
+                const res = await API.toggleCarnet(doc, 'no realizar');
+                if (res.success) {
+                    const idx = this.state.users.findIndex(u => u.numero_documento_aprendiz == doc);
+                    if (idx > -1) this.state.users[idx].estado_carnet = 'no realizar';
+                    this.render();
+                } else {
+                    alert('Error al actualizar.');
+                }
+            };
+        });
+    },
+
     bindEvents() {
+        const btnShowCharts = document.getElementById('btn-show-charts');
+        const btnCloseCharts = document.getElementById('btn-close-charts');
+        const chartsModal = document.getElementById('charts-modal');
+        
+        if (btnShowCharts) {
+            btnShowCharts.onclick = () => {
+                chartsModal.classList.remove('hidden');
+                // Force chart update if needed when visible
+                this.render();
+            };
+        }
+        if (btnCloseCharts) {
+            btnCloseCharts.onclick = () => chartsModal.classList.add('hidden');
+        }
+
         document.getElementById('admin-search').oninput = () => { this.state.currentPage = 1; this.render(); };
         document.getElementById('admin-filter').onchange = () => { this.state.currentPage = 1; this.render(); };
-        const roleFilter = document.getElementById('admin-role-filter');
-        if (roleFilter) roleFilter.onchange = () => { this.state.currentPage = 1; this.render(); };
+        
+        document.querySelectorAll('.role-checkbox').forEach(cb => {
+            cb.onchange = () => { this.state.currentPage = 1; this.render(); };
+        });
+
         const fichaFilter = document.getElementById('admin-ficha-filter');
         if (fichaFilter) fichaFilter.oninput = () => { this.state.currentPage = 1; this.render(); };
         document.getElementById('admin-page-size').onchange = () => { this.state.currentPage = 1; this.render(); };

@@ -460,56 +460,34 @@
                 </div>
                 <div class="card-body">
 
-                    <!-- Métricas -->
-                    <div class="dashboard-metrics">
-                        <div class="metric-card">
-                            <div class="metric-icon"><i data-lucide="users"></i></div>
-                            <h4>Registrados</h4>
-                            <p id="metric-total">0</p>
-                        </div>
-                        <div class="metric-card success">
-                            <div class="metric-icon"><i data-lucide="check-circle"></i></div>
-                            <h4>Validados</h4>
-                            <p id="metric-validado">0</p>
-                        </div>
-                        <div class="metric-card danger">
-                            <div class="metric-icon"><i data-lucide="clock"></i></div>
-                            <h4>Pendientes</h4>
-                            <p id="metric-no-validado">0</p>
-                        </div>
-                        <div class="metric-card warning">
-                            <div class="metric-icon"><i data-lucide="image-off"></i></div>
-                            <h4>Sin Foto</h4>
-                            <p id="metric-incompletos">0</p>
-                        </div>
-                        <div class="metric-card" style="border-left: 3px solid #8b5cf6;">
-                            <div class="metric-icon" style="background: #ede9fe; color: #8b5cf6;"><i data-lucide="credit-card"></i></div>
-                            <h4>Carnet Realizado</h4>
-                            <p id="metric-carnet-entregado">0</p>
-                        </div>
-                    </div>
-
                     <!-- Filtros -->
-                    <div class="dashboard-filters">
+                    <div class="dashboard-filters" style="margin-bottom: 24px;">
                         <div class="input-with-icon">
                             <i data-lucide="search"></i>
                             <input type="text" id="admin-search" placeholder="Buscar por documento o nombre...">
                         </div>
                         <select id="admin-filter">
-                            <option value="todos">Todos los estados (Validación)</option>
-                            <option value="validado">Validados</option>
-                            <option value="no_validado">Pendientes (Validación)</option>
-                            <option value="completos">Docs. Completos</option>
-                            <option value="incompletos">Docs. Incompletos</option>
-                            <option value="carnet_realizado">Carnet Realizado</option>
-                            <option value="carnet_pendiente">Carnet Pendiente</option>
+                            <option value="todos">Mostrar Todos</option>
+                            <optgroup label="Por Validación">
+                                <option value="validado">Validados</option>
+                                <option value="no_validado">Pendientes de Validación</option>
+                            </optgroup>
+                            <optgroup label="Por Documentos">
+                                <option value="completos">Documentos Completos</option>
+                                <option value="incompletos">Documentos Incompletos</option>
+                            </optgroup>
+                            <optgroup label="Por Estado de Carnet">
+                                <option value="carnet_realizado">Carnet Realizado</option>
+                                <option value="carnet_pendiente">Carnet Pendiente (Falta Generar)</option>
+                                <option value="carnet_no_realizar">No Realizar Carnet</option>
+                            </optgroup>
                         </select>
-                        <select id="admin-role-filter">
-                            <option value="todos">Todos los roles</option>
-                            <option value="APRENDIZ">Aprendiz</option>
-                            <option value="INSTRUCTOR">Instructor</option>
-                            <option value="ADMINISTRATIVO">Administrativo</option>
-                        </select>
+                        <div id="admin-role-filter-group" style="display:flex; gap:12px; align-items:center; background:#fff; padding:0 12px; border:1px solid var(--border); border-radius:6px; height: 38px;">
+                            <span style="font-size:0.75rem; color:var(--text-muted); font-weight:bold;">Roles:</span>
+                            <label style="display:flex; align-items:center; gap:4px; font-size:0.8rem; cursor:pointer;"><input type="checkbox" value="APRENDIZ" class="role-checkbox" checked> Aprendiz</label>
+                            <label style="display:flex; align-items:center; gap:4px; font-size:0.8rem; cursor:pointer;"><input type="checkbox" value="INSTRUCTOR" class="role-checkbox" checked> Instructor</label>
+                            <label style="display:flex; align-items:center; gap:4px; font-size:0.8rem; cursor:pointer;"><input type="checkbox" value="ADMINISTRATIVO" class="role-checkbox" checked> Admin</label>
+                        </div>
                         <div class="input-with-icon autocomplete-container" style="position:relative;">
                             <i data-lucide="users"></i>
                             <input type="text" id="admin-ficha-filter" placeholder="Buscar por ficha..." autocomplete="off">
@@ -522,6 +500,38 @@
                         </select>
                     </div>
 
+                    <!-- Resumen de Estadísticas -->
+                    <div style="display: flex; gap: 16px; margin-bottom: 24px; align-items: center; flex-wrap: wrap;">
+                        <div class="metric-card" style="margin: 0; padding: 16px; flex: 1; min-width: 200px;">
+                            <div class="metric-icon"><i data-lucide="users"></i></div>
+                            <h4>Registrados</h4>
+                            <p id="metric-total">0</p>
+                        </div>
+                        <div class="metric-card" style="border-left: 3px solid #f59e0b; margin: 0; padding: 16px; flex: 1; min-width: 200px;">
+                            <div class="metric-icon" style="background: #fef3c7; color: #f59e0b;"><i data-lucide="printer"></i></div>
+                            <h4>Faltan por Generar</h4>
+                            <p id="metric-carnet-faltante">0</p>
+                        </div>
+                        <div class="metric-card danger" style="margin: 0; padding: 16px; flex: 1; min-width: 200px;">
+                            <div class="metric-icon"><i data-lucide="clock"></i></div>
+                            <h4>Pendientes (Validación)</h4>
+                            <p id="metric-no-validado">0</p>
+                        </div>
+                        
+                        <div style="flex: 1; min-width: 200px; display: flex; justify-content: flex-end; padding: 16px 0;">
+                            <button type="button" class="btn btn-primary" id="btn-show-charts" style="height: 100%; padding: 12px 24px;">
+                                <i data-lucide="pie-chart"></i> Ver Gráficas
+                            </button>
+                        </div>
+
+                        <!-- Hidden DOM elements to prevent breaking existing admin.js logic that expects these IDs -->
+                        <div style="display: none;">
+                            <p id="metric-validado">0</p>
+                            <p id="metric-incompletos">0</p>
+                            <p id="metric-carnet-entregado">0</p>
+                        </div>
+                    </div>
+
                     <!-- Tabla -->
                     <div class="table-responsive">
                         <table id="users-table">
@@ -529,7 +539,6 @@
                                 <tr>
                                     <th>Persona / Documento</th>
                                     <th>Rol / Ficha / Programa</th>
-                                    <th>Contacto</th>
                                     <th>Archivos</th>
                                     <th>Estado</th>
                                     <th>Carnet</th>
@@ -575,6 +584,27 @@
                 <div class="card-body" style="flex: 1 1 auto; padding: 0; position: relative; min-height: 400px;">
                     <iframe id="diagram-iframe" frameborder="0" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-bottom-left-radius: var(--radius); border-bottom-right-radius: var(--radius);"></iframe>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════
+         Modal: Info de Contacto
+    ══════════════════════════════════════════════════ -->
+    <div id="contact-modal" class="modal hidden">
+        <div class="modal-content" style="max-width: 400px;">
+            <h3>Información de Contacto</h3>
+            <p class="help-text" id="contact-modal-name" style="font-weight:bold; color:var(--text-color); margin-bottom: 16px;"></p>
+            <div style="font-size: 0.9rem; line-height: 1.8; margin-bottom: 24px;">
+                <span style="color:var(--text-muted); font-size:0.75rem; text-transform:uppercase; font-weight:700;">Correo Electrónico</span><br>
+                <div id="contact-modal-email" style="background:#f1f5f9; padding:8px; border-radius:4px; margin-bottom:12px; word-break:break-all;"></div>
+                <span style="color:var(--text-muted); font-size:0.75rem; text-transform:uppercase; font-weight:700;">Teléfono</span><br>
+                <div id="contact-modal-phone" style="background:#f1f5f9; padding:8px; border-radius:4px;"></div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-primary" id="btn-close-contact-modal" style="width: 100%;">
+                    Cerrar
+                </button>
             </div>
         </div>
     </div>
@@ -691,7 +721,40 @@
         </div>
     </div>
 
+    <!-- ══════════════════════════════════════════════════
+         Modal: Gráficas de Estadísticas
+    ══════════════════════════════════════════════════ -->
+    <div id="charts-modal" class="modal hidden" style="background: transparent; pointer-events: none;">
+        <div class="modal-content" style="pointer-events: auto; position: absolute; top: 160px; right: 24px; width: 600px; max-width: 90vw; padding: 24px; margin: 0; transform: none; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04); border: 1px solid var(--border);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border);">
+                <h3 style="margin:0; font-size: 1.1rem;">Gráficas Estadísticas</h3>
+                <button type="button" class="btn-icon btn-ghost" id="btn-close-charts" title="Cerrar">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+                <!-- Gráfica de Carnets -->
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                    <h4 style="font-size: 0.85rem; color: var(--text-sub); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Estado de Carnet</h4>
+                    <div style="position: relative; width: 100%; aspect-ratio: 1; max-height: 250px;">
+                        <canvas id="chartCarnet"></canvas>
+                    </div>
+                </div>
+
+                <!-- Gráfica de Validación -->
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                    <h4 style="font-size: 0.85rem; color: var(--text-sub); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Validación</h4>
+                    <div style="position: relative; width: 100%; aspect-ratio: 1; max-height: 250px;">
+                        <canvas id="chartValidacion"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script type="module" src="assets/js/main.js"></script>
     <script>
         // Initialize Lucide icons after DOM is ready

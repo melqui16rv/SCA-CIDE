@@ -58,7 +58,7 @@ try {
     if ($action === 'toggle_carnet') {
         $documento = $_GET['documento'] ?? '';
         $estado = $_GET['estado'] ?? '';
-        if ($documento && in_array($estado, ['realizado', 'pendiente'])) {
+        if ($documento && in_array($estado, ['realizado', 'pendiente', 'no realizar'])) {
             $stmt = $pdo->prepare('UPDATE sca_cide_aprendices SET estado_carnet = ? WHERE numero_documento_aprendiz = ?');
             $stmt->execute([$estado, $documento]);
             echo json_encode(['success' => true]);

@@ -6,7 +6,7 @@ import UI from './modules/ui.js';
 import Camera from './modules/camera.js';
 import Utils from './modules/utils.js';
 import Location from './modules/location.js';
-import { Dashboard } from './modules/dashboard.js';
+import Dashboard from './modules/dashboard.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // State

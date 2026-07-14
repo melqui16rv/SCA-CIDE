@@ -4,7 +4,7 @@
 import API from './api.js';
 import UI from './ui.js';
 
-const Admin = {
+export const Dashboard = {
     state: {
         users: [],
         currentPage: 1,

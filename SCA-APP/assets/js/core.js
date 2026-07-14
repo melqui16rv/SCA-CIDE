@@ -6,7 +6,7 @@ import UI from './modules/ui.js';
 import Camera from './modules/camera.js';
 import Utils from './modules/utils.js';
 import Location from './modules/location.js';
-import Admin from './modules/admin.js';
+import { Dashboard } from './modules/dashboard.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // State
@@ -384,7 +384,7 @@ document.addEventListener('DOMContentLoaded', () => {
         UI.hideLoading();
 
         if (res.success) {
-            Admin.init();
+            Dashboard.init();
         } else {
             document.getElementById('admin-error-msg').textContent = res.message;
         }

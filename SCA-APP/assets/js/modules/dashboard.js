@@ -208,6 +208,8 @@ const Dashboard = {
         this.state.itemsPerPage = parseInt(document.getElementById('admin-page-size').value) || 10;
 
         let total = 0, validado = 0, pendiente = 0, incompletos = 0, carnetEntregado = 0, carnetNoRealizar = 0;
+        let listosParaValidar = 0;
+        let pendientesIncompletos = 0;
 
         // Calculate Metrics & Filter
         const filtered = this.state.users.filter(u => {
@@ -218,7 +220,16 @@ const Dashboard = {
             const isCarnetEntregado = u.estado_carnet === 'realizado';
             const isCarnetNoRealizar = u.estado_carnet === 'no realizar';
 
-            if (isValid) validado++; else pendiente++;
+            if (isValid) {
+                validado++;
+            } else {
+                pendiente++;
+                if (hasFoto && hasDoc) {
+                    listosParaValidar++;
+                } else {
+                    pendientesIncompletos++;
+                }
+            }
             if (!hasFoto || !hasDoc) incompletos++;
             if (isCarnetEntregado) carnetEntregado++;
             if (isCarnetNoRealizar) carnetNoRealizar++;
@@ -275,7 +286,7 @@ const Dashboard = {
         const faltantesGenerar = total - carnetNoRealizar - carnetEntregado;
         if (metricFaltante) metricFaltante.textContent = faltantesGenerar;
 
-        this.renderCharts(carnetEntregado, faltantesGenerar, carnetNoRealizar, validado, pendiente);
+        this.renderCharts(carnetEntregado, faltantesGenerar, carnetNoRealizar, validado, listosParaValidar, pendientesIncompletos);
 
         // Pagination
         const totalPages = Math.ceil(filtered.length / this.state.itemsPerPage);
@@ -403,8 +414,17 @@ const Dashboard = {
         if (next) next.disabled = this.state.currentPage >= totalPages;
     },
 
-    renderCharts(carnetRealizado, carnetFaltante, carnetNoRealizar, validado, pendiente) {
+    renderCharts(carnetRealizado, carnetFaltante, carnetNoRealizar, validado, listosParaValidar, pendientesIncompletos) {
         if (!window.Chart) return;
+        if (window.ChartDataLabels && !Chart.registry.plugins.get('datalabels')) {
+            Chart.register(window.ChartDataLabels);
+        }
+
+        const datalabelsOptions = {
+            color: '#fff',
+            font: { weight: 'bold', size: 12 },
+            formatter: (value) => value > 0 ? value : ''
+        };
         
         const ctxCarnet = document.getElementById('chartCarnet');
         const ctxValidacion = document.getElementById('chartValidacion');
@@ -420,31 +440,31 @@ const Dashboard = {
                         labels: ['Realizado', 'Falta Generar', 'No Realizar'],
                         datasets: [{
                             data: [carnetRealizado, carnetFaltante, carnetNoRealizar],
-                            backgroundColor: ['#8b5cf6', '#f59e0b', '#e2e8f0'],
+                            backgroundColor: ['#8b5cf6', '#f59e0b', '#cbd5e1'],
                             borderWidth: 0
                         }]
                     },
-                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } } }
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }, datalabels: datalabelsOptions } }
                 });
             }
         }
         
         if (ctxValidacion) {
             if (this.state.chartValidacionInstance) {
-                this.state.chartValidacionInstance.data.datasets[0].data = [validado, pendiente];
+                this.state.chartValidacionInstance.data.datasets[0].data = [validado, listosParaValidar, pendientesIncompletos];
                 this.state.chartValidacionInstance.update();
             } else {
                 this.state.chartValidacionInstance = new Chart(ctxValidacion, {
                     type: 'doughnut',
                     data: {
-                        labels: ['Validados', 'Pendientes'],
+                        labels: ['Validados', 'Listos p/ Validar', 'Incompletos'],
                         datasets: [{
-                            data: [validado, pendiente],
-                            backgroundColor: ['#10b981', '#ef4444'],
+                            data: [validado, listosParaValidar, pendientesIncompletos],
+                            backgroundColor: ['#10b981', '#3b82f6', '#ef4444'],
                             borderWidth: 0
                         }]
                     },
-                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } } }
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }, datalabels: datalabelsOptions } }
                 });
             }
         }

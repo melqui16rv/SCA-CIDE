@@ -147,7 +147,28 @@ const Dashboard = {
     render() {
         const tbody = document.getElementById('users-tbody');
         const searchTerm = document.getElementById('admin-search').value.toLowerCase();
-        const filterStatus = document.getElementById('admin-filter').value;
+        const statusCheckboxes = document.querySelectorAll('.status-filter-checkbox:checked');
+        const selectedStatuses = Array.from(statusCheckboxes).map(cb => cb.value);
+
+        const activeFiltersContainer = document.getElementById('active-filters-container');
+        const activeFiltersBar = document.getElementById('active-filters-bar');
+        
+        if (activeFiltersContainer && activeFiltersBar) {
+            activeFiltersContainer.innerHTML = '';
+            if (selectedStatuses.length > 0) {
+                activeFiltersBar.style.display = 'flex';
+                statusCheckboxes.forEach(cb => {
+                    const badge = document.createElement('span');
+                    badge.className = 'badge';
+                    badge.style.background = '#e2e8f0';
+                    badge.style.color = '#334155';
+                    badge.textContent = cb.dataset.label;
+                    activeFiltersContainer.appendChild(badge);
+                });
+            } else {
+                activeFiltersBar.style.display = 'none';
+            }
+        }
         
         const roleCheckboxes = document.querySelectorAll('.role-checkbox:checked');
         const selectedRoles = Array.from(roleCheckboxes).map(cb => cb.value);
@@ -171,13 +192,31 @@ const Dashboard = {
             if (isCarnetEntregado) carnetEntregado++;
             if (isCarnetNoRealizar) carnetNoRealizar++;
 
-            if (filterStatus === 'validado' && !isValid) return false;
-            if (filterStatus === 'no_validado' && isValid) return false;
-            if (filterStatus === 'completos' && (!hasFoto || !hasDoc)) return false;
-            if (filterStatus === 'incompletos' && (hasFoto && hasDoc)) return false;
-            if (filterStatus === 'carnet_realizado' && !isCarnetEntregado) return false;
-            if (filterStatus === 'carnet_pendiente' && (isCarnetEntregado || isCarnetNoRealizar)) return false;
-            if (filterStatus === 'carnet_no_realizar' && !isCarnetNoRealizar) return false;
+            const selectedValidacion = selectedStatuses.filter(s => ['validado', 'no_validado'].includes(s));
+            const selectedDocs = selectedStatuses.filter(s => ['completos', 'incompletos'].includes(s));
+            const selectedCarnet = selectedStatuses.filter(s => ['carnet_realizado', 'carnet_pendiente', 'carnet_no_realizar'].includes(s));
+
+            if (selectedValidacion.length > 0) {
+                let match = false;
+                if (selectedValidacion.includes('validado') && isValid) match = true;
+                if (selectedValidacion.includes('no_validado') && !isValid) match = true;
+                if (!match) return false;
+            }
+
+            if (selectedDocs.length > 0) {
+                let match = false;
+                if (selectedDocs.includes('completos') && (hasFoto && hasDoc)) match = true;
+                if (selectedDocs.includes('incompletos') && (!hasFoto || !hasDoc)) match = true;
+                if (!match) return false;
+            }
+
+            if (selectedCarnet.length > 0) {
+                let match = false;
+                if (selectedCarnet.includes('carnet_realizado') && isCarnetEntregado) match = true;
+                if (selectedCarnet.includes('carnet_pendiente') && (!isCarnetEntregado && !isCarnetNoRealizar)) match = true;
+                if (selectedCarnet.includes('carnet_no_realizar') && isCarnetNoRealizar) match = true;
+                if (!match) return false;
+            }
 
             if (u.rol && !selectedRoles.includes(u.rol)) return false;
             
@@ -437,7 +476,36 @@ const Dashboard = {
         }
 
         document.getElementById('admin-search').oninput = () => { this.state.currentPage = 1; this.render(); };
-        document.getElementById('admin-filter').onchange = () => { this.state.currentPage = 1; this.render(); };
+        const btnToggleFilters = document.getElementById('btn-toggle-filters');
+        const filtersPanel = document.getElementById('advanced-filters-panel');
+        
+        if (btnToggleFilters && filtersPanel) {
+            btnToggleFilters.onclick = (e) => {
+                e.stopPropagation();
+                filtersPanel.style.display = filtersPanel.style.display === 'none' ? 'block' : 'none';
+            };
+            
+            document.addEventListener('click', (e) => {
+                if (filtersPanel.style.display === 'block' && !filtersPanel.contains(e.target) && e.target !== btnToggleFilters) {
+                    filtersPanel.style.display = 'none';
+                }
+            });
+            
+            filtersPanel.onclick = (e) => e.stopPropagation();
+        }
+
+        document.querySelectorAll('.status-filter-checkbox').forEach(cb => {
+            cb.onchange = () => { this.state.currentPage = 1; this.render(); };
+        });
+
+        const btnClearFilters = document.getElementById('btn-clear-filters');
+        if (btnClearFilters) {
+            btnClearFilters.onclick = () => {
+                document.querySelectorAll('.status-filter-checkbox').forEach(cb => cb.checked = false);
+                this.state.currentPage = 1; 
+                this.render();
+            };
+        }
         
         document.querySelectorAll('.role-checkbox').forEach(cb => {
             cb.onchange = () => { this.state.currentPage = 1; this.render(); };

@@ -426,6 +426,23 @@ const Dashboard = {
             formatter: (value) => value > 0 ? value.toLocaleString('es-CO') : ''
         };
         
+        const handleLegendClick = function(e, legendItem, legend) {
+            const index = legendItem.index;
+            const chart = legend.chart;
+            chart.toggleDataVisibility(index);
+            chart.update();
+            
+            let sum = 0;
+            chart.data.datasets[0].data.forEach((value, i) => {
+                if (chart.getDataVisibility(i)) {
+                    sum += value;
+                }
+            });
+            const totalId = chart.canvas.id === 'chartCarnet' ? 'totalChartCarnet' : 'totalChartValidacion';
+            const totalEl = document.getElementById(totalId);
+            if (totalEl) totalEl.textContent = 'Total: ' + sum.toLocaleString('es-CO');
+        };
+
         const ctxCarnet = document.getElementById('chartCarnet');
         const ctxValidacion = document.getElementById('chartValidacion');
         
@@ -454,7 +471,7 @@ const Dashboard = {
                             borderWidth: 0
                         }]
                     },
-                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }, datalabels: datalabelsOptions } }
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } }, onClick: handleLegendClick }, datalabels: datalabelsOptions } }
                 });
             }
         }
@@ -474,7 +491,7 @@ const Dashboard = {
                             borderWidth: 0
                         }]
                     },
-                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }, datalabels: datalabelsOptions } }
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } }, onClick: handleLegendClick }, datalabels: datalabelsOptions } }
                 });
             }
         }

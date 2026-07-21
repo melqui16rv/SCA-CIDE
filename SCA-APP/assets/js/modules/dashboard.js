@@ -150,13 +150,49 @@ const Dashboard = {
         const statusCheckboxes = document.querySelectorAll('.status-filter-checkbox:checked');
         const selectedStatuses = Array.from(statusCheckboxes).map(cb => cb.value);
 
+        const filterFicha = document.getElementById('admin-ficha-filter') ? document.getElementById('admin-ficha-filter').value.trim() : '';
+
+        const roleCheckboxes = document.querySelectorAll('.role-checkbox:checked');
+        const selectedRoles = Array.from(roleCheckboxes).map(cb => cb.value);
+
         const activeFiltersContainer = document.getElementById('active-filters-container');
         const activeFiltersBar = document.getElementById('active-filters-bar');
         
         if (activeFiltersContainer && activeFiltersBar) {
             activeFiltersContainer.innerHTML = '';
-            if (selectedStatuses.length > 0) {
+            
+            const hasActiveFilters = selectedStatuses.length > 0 || selectedRoles.length > 0 || searchTerm !== '' || filterFicha !== '';
+
+            if (hasActiveFilters) {
                 activeFiltersBar.style.display = 'flex';
+                
+                if (searchTerm !== '') {
+                    const badge = document.createElement('span');
+                    badge.className = 'badge';
+                    badge.style.background = '#e2e8f0';
+                    badge.style.color = '#334155';
+                    badge.textContent = `Busca: ${searchTerm}`;
+                    activeFiltersContainer.appendChild(badge);
+                }
+
+                if (filterFicha !== '') {
+                    const badge = document.createElement('span');
+                    badge.className = 'badge';
+                    badge.style.background = '#e2e8f0';
+                    badge.style.color = '#334155';
+                    badge.textContent = `Ficha: ${filterFicha}`;
+                    activeFiltersContainer.appendChild(badge);
+                }
+
+                roleCheckboxes.forEach(cb => {
+                    const badge = document.createElement('span');
+                    badge.className = 'badge';
+                    badge.style.background = '#e2e8f0';
+                    badge.style.color = '#334155';
+                    badge.textContent = cb.dataset.label;
+                    activeFiltersContainer.appendChild(badge);
+                });
+
                 statusCheckboxes.forEach(cb => {
                     const badge = document.createElement('span');
                     badge.className = 'badge';
@@ -169,11 +205,6 @@ const Dashboard = {
                 activeFiltersBar.style.display = 'none';
             }
         }
-        
-        const roleCheckboxes = document.querySelectorAll('.role-checkbox:checked');
-        const selectedRoles = Array.from(roleCheckboxes).map(cb => cb.value);
-
-        const filterFicha = document.getElementById('admin-ficha-filter') ? document.getElementById('admin-ficha-filter').value.trim() : '';
         this.state.itemsPerPage = parseInt(document.getElementById('admin-page-size').value) || 10;
 
         let total = 0, validado = 0, pendiente = 0, incompletos = 0, carnetEntregado = 0, carnetNoRealizar = 0;
@@ -218,7 +249,7 @@ const Dashboard = {
                 if (!match) return false;
             }
 
-            if (u.rol && !selectedRoles.includes(u.rol)) return false;
+            if (selectedRoles.length > 0 && u.rol && !selectedRoles.includes(u.rol)) return false;
             
             if (filterFicha !== '') {
                 const fStr = (u.ficha_aprendiz || '').toLowerCase();
@@ -502,6 +533,11 @@ const Dashboard = {
         if (btnClearFilters) {
             btnClearFilters.onclick = () => {
                 document.querySelectorAll('.status-filter-checkbox').forEach(cb => cb.checked = false);
+                document.querySelectorAll('.role-checkbox').forEach(cb => cb.checked = false);
+                document.getElementById('admin-search').value = '';
+                const fichaFilterEl = document.getElementById('admin-ficha-filter');
+                if (fichaFilterEl) fichaFilterEl.value = '';
+                
                 this.state.currentPage = 1; 
                 this.render();
             };

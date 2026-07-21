@@ -208,8 +208,7 @@ const Dashboard = {
         this.state.itemsPerPage = parseInt(document.getElementById('admin-page-size').value) || 10;
 
         let total = 0, validado = 0, pendiente = 0, incompletos = 0, carnetEntregado = 0, carnetNoRealizar = 0;
-        let listosParaValidar = 0;
-        let pendientesIncompletos = 0;
+        let chartValidado = 0, chartListos = 0, chartIncompletos = 0, chartNoRealizar = 0;
 
         // Calculate Metrics & Filter
         const filtered = this.state.users.filter(u => {
@@ -220,19 +219,20 @@ const Dashboard = {
             const isCarnetEntregado = u.estado_carnet === 'realizado';
             const isCarnetNoRealizar = u.estado_carnet === 'no realizar';
 
-            if (isValid) {
-                validado++;
-            } else {
-                pendiente++;
-                if (hasFoto && hasDoc) {
-                    listosParaValidar++;
-                } else {
-                    pendientesIncompletos++;
-                }
-            }
+            if (isValid) validado++; else pendiente++;
             if (!hasFoto || !hasDoc) incompletos++;
             if (isCarnetEntregado) carnetEntregado++;
             if (isCarnetNoRealizar) carnetNoRealizar++;
+
+            if (isCarnetNoRealizar) {
+                chartNoRealizar++;
+            } else if (isValid) {
+                chartValidado++;
+            } else if (hasFoto && hasDoc) {
+                chartListos++;
+            } else {
+                chartIncompletos++;
+            }
 
             const selectedValidacion = selectedStatuses.filter(s => ['validado', 'no_validado'].includes(s));
             const selectedDocs = selectedStatuses.filter(s => ['completos', 'incompletos'].includes(s));
@@ -286,7 +286,7 @@ const Dashboard = {
         const faltantesGenerar = total - carnetNoRealizar - carnetEntregado;
         if (metricFaltante) metricFaltante.textContent = faltantesGenerar;
 
-        this.renderCharts(carnetEntregado, faltantesGenerar, carnetNoRealizar, validado, listosParaValidar, pendientesIncompletos);
+        this.renderCharts(carnetEntregado, faltantesGenerar, carnetNoRealizar, chartValidado, chartListos, chartIncompletos, chartNoRealizar);
 
         // Pagination
         const totalPages = Math.ceil(filtered.length / this.state.itemsPerPage);
@@ -414,7 +414,7 @@ const Dashboard = {
         if (next) next.disabled = this.state.currentPage >= totalPages;
     },
 
-    renderCharts(carnetRealizado, carnetFaltante, carnetNoRealizar, validado, listosParaValidar, pendientesIncompletos) {
+    renderCharts(carnetRealizado, carnetFaltante, carnetNoRealizar, validado, listosParaValidar, pendientesIncompletos, validacionNoRealizar) {
         if (!window.Chart) return;
         if (window.ChartDataLabels && !Chart.registry.plugins.get('datalabels')) {
             Chart.register(window.ChartDataLabels);
@@ -423,11 +423,21 @@ const Dashboard = {
         const datalabelsOptions = {
             color: '#fff',
             font: { weight: 'bold', size: 12 },
-            formatter: (value) => value > 0 ? value : ''
+            formatter: (value) => value > 0 ? value.toLocaleString('es-CO') : ''
         };
         
         const ctxCarnet = document.getElementById('chartCarnet');
         const ctxValidacion = document.getElementById('chartValidacion');
+        
+        const totalCarnet = carnetRealizado + carnetFaltante + carnetNoRealizar;
+        const totalValidacion = validado + listosParaValidar + pendientesIncompletos + validacionNoRealizar;
+
+        if (document.getElementById('totalChartCarnet')) {
+            document.getElementById('totalChartCarnet').textContent = 'Total: ' + totalCarnet.toLocaleString('es-CO');
+        }
+        if (document.getElementById('totalChartValidacion')) {
+            document.getElementById('totalChartValidacion').textContent = 'Total: ' + totalValidacion.toLocaleString('es-CO');
+        }
         
         if (ctxCarnet) {
             if (this.state.chartCarnetInstance) {
@@ -451,16 +461,16 @@ const Dashboard = {
         
         if (ctxValidacion) {
             if (this.state.chartValidacionInstance) {
-                this.state.chartValidacionInstance.data.datasets[0].data = [validado, listosParaValidar, pendientesIncompletos];
+                this.state.chartValidacionInstance.data.datasets[0].data = [validado, listosParaValidar, pendientesIncompletos, validacionNoRealizar];
                 this.state.chartValidacionInstance.update();
             } else {
                 this.state.chartValidacionInstance = new Chart(ctxValidacion, {
                     type: 'doughnut',
                     data: {
-                        labels: ['Validados', 'Listos p/ Validar', 'Incompletos'],
+                        labels: ['Validados', 'Listos p/ Validar', 'Incompletos', 'No Realizar'],
                         datasets: [{
-                            data: [validado, listosParaValidar, pendientesIncompletos],
-                            backgroundColor: ['#10b981', '#3b82f6', '#ef4444'],
+                            data: [validado, listosParaValidar, pendientesIncompletos, validacionNoRealizar],
+                            backgroundColor: ['#10b981', '#3b82f6', '#ef4444', '#cbd5e1'],
                             borderWidth: 0
                         }]
                     },
